@@ -1,0 +1,59 @@
+Test_num: 2 # Maximum speed of platform
+Interfaces:
+  Raw_data: [
+    Robot.odom, # Current velocity
+    Sensors.location # Ground truth location
+    ]
+  Events: [
+    Events.Robot.Start, # Robot should start moving
+    Events.Robot.Stop, # Robot should stop moving
+    Events.Robot.Is_stopped # Robot has stopped moving
+     ]
+
+Calculators:
+  Event_emitter: Robot_is_stopped
+    Inputs: Robot.odom
+    Operation: Calculate when robot is stopped
+    Outputs: Events.Robot.Is_stopped
+  Timer: Robot_is_at_checkpoits
+    Inputs: [Events.Robot.Is_at_CP1, Events.Robot.Is_at_CP2]
+    Operation: Calculate time gap between between {Events.Robot.Is_at_CP1<->Events.Robot.Is_at_CP2}
+    Outputs: Time duration in seconds # text output, save to file
+  Distance_calculator:
+    Inputs: [Sensors.location, Events.Robot.Stop, Events.Robot.Is_stopped]
+    Operation: Calculate distance covered between {Events.Robot.Stop<->Events.Robot.Is_stopped}
+    Outputs: Distance in meters # text output, save to file
+  Velocity_calculator:
+    Inputs: Timing_calculator.time, Distance_calculator.distace
+    Operation: Calculate velocity based on distance and time
+    Outputs: Velocity in m/s # text output, save to file
+
+Interface_interpreters:
+  Location_interpreter: Convert sensor data to Sensors.location
+  Command_interpreter: Convert Events.Robot.Stop & Events.Robot.Is_stopped to robot velocity commands
+  Odom_interpreter: Convert robot odometry to Robot.odom (usually standard, might not be needed)
+
+Parameters: [location_of_CP1, location_of_CP2]
+
+Test_runner:
+  Concurrence_1: Run main test sequence
+    Sequence_1: Wait for Events.Test.Start
+    Sequence_2: Emit Events.Robot.Start
+    Sequence_3: Wait for Events.Robot.Is_at_CP2
+    Sequence_4: Emit Events.Robot.Stop
+  Concurrence_2: Abort if necessary
+    Sequence_1: Wait for Events.Test.Abort
+    Sequence_2: Abort entire test
+
+UI_elements:
+  Inputs: [User_input.Start_test, User_input.Abort_test]
+  Display: [Text.velocity_in_ms, Text.Status_messages]
+  Outputs: [Events.Test.Start, Events.Test.Abort]
+
+
+Orchestration:
+  Launch: All interpreters
+  Launch: Load all calculators
+  Launch: UI elements
+  Launch: Test_runner
+  

@@ -1,0 +1,8 @@
+vel_zero: 0 # Zero velocity for comparator
+max_vel : 0.5 # "The maximum value of the robot's velocity. Used by the comparator"
+save_filename: "institute_name_robot_name_" # Prepended to all filenames written to by the test
+speed_x_text: "Time in seconds" # "Title of x axis for speed plotter"
+speed_y_text: "Speed in m/s" # "Title of y axis for speed plotter"
+speed_title: "Speed profile" # "Title of plot for speed plotter"
+speed_resolution: 2 # resolution of plot
+recorder_stop_offset: 5 # Any rosbag recorder nodes will wait these many additional seconds before stopping recording

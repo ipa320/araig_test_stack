@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>araig_test_stack</name>
+  <version>1.0.0</version>
+  <description>The araig_test_stack package</description>
+
+  <maintainer email="tejas.kumar.shastha@ipa.fraunhofer.de">Tejas</maintainer>
+  <maintainer email="ruichao.wu@ipa.fraunhofer.de">ruichao</maintainer>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>araig_calculators</exec_depend>
+  <exec_depend>araig_interpreters</exec_depend>
+  <exec_depend>araig_msgs</exec_depend>
+  <exec_depend>araig_test_runners</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

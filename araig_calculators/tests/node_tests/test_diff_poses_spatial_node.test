@@ -1,0 +1,13 @@
+<launch>
+
+    <node pkg="araig_calculators" type="diff_poses_spatial_node" name="diff_poses_spatial_node" output="screen">
+        <remap from="/in_obj_1" to="/test/in_obj_1"/>
+        <remap from="/in_obj_2" to="/test/in_obj_2"/>
+        <remap from="out_disp_angular" to="/test/out_disp_angular"/>
+        <remap from="out_disp_position" to="/test/out_disp_position"/>
+    </node>
+
+    <test test-name="test_diff_poses_spatial_node" pkg="araig_calculators" type="test_diff_poses_spatial_node.py">
+    </test>
+
+</launch>

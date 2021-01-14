@@ -1,0 +1,95 @@
+Calculators:
+  - type: Comparator
+    Name: robot_has_stopped
+    Description: Calculate when robot is stopped
+    Inputs:
+      Data:
+        - Data.robot.odom.twist.x
+    Parameters:
+      - vel_zero
+    Outputs:
+      Signals:
+        - Signal.calc.robot_has_stopped
+
+  - type: Comparator
+    Name: robot_has_max_vel
+    Description: Calculate when robot has reached max velocity
+    Inputs:
+      Data:
+        - Data.robot.odom.twist.x
+    Parameters:
+      - max_vel
+    Outputs:
+      Signals:
+        - Signal.calc.robot_has_max_vel
+
+  - type: Timer
+    name: braking_time
+    Description: Calculate time gap between between stop signal given and robot actually stopping
+    Inputs:
+      Signals:
+        - Signal.runner.stop_robot
+        - Signal.calc.robot_has_stopped
+    Parameters:
+      - save_filename
+    Outputs:
+      Data:
+        - Data.calc.braking_time
+
+  # If interested, could also make braking distance Y axis calculation to check cross-axial drift.
+  - type: Delta
+    name: braking_distance
+    Description: Calculate distance covered between stop signal given and robot actually stopping in X axis
+    Inputs:
+      Data:
+        - Data.interpreter.location.robot.x
+      Signals:
+        - Signal.runner.stop_robot
+        - Signal.calc.robot_has_stopped
+    Parameters:
+      - save_filename
+    Outputs:
+      Data:
+        - Data.calc.braking_distance
+
+  - type: Logger
+    name: location_profile_logger
+    Description: Log the position profile
+    Inputs:
+      - Data.interpreter.location.robot # Example 7 columns
+    Parameters:
+      - save_filename
+    Outputs:
+
+  - type: Logger
+    name: speed_profile_logger
+    Description: Log the speed profile
+    Inputs:
+      - Data.robot.odom # Example 13 columns. This needs to be handled runtime
+    Parameters:
+      - save_filename
+    Outputs:
+
+  - type: Plotter
+    name: speed_profile
+    Description: Plot the speed profile
+    Inputs:
+      - Data.robot.odom.twist.x
+    Parameters:
+      - speed_x_text
+      - speed_y_text
+      - speed_title
+      - speed_resolution
+    outputs:
+
+  - type: Rosbagger
+    name: bag_video
+    Description: Record the video stream
+    Inputs:
+      - Signals.ui.start_test
+      - Signals.calc.robot_has_stopped
+    Parameters:
+      - save_filename
+      - [Data.sensors.camera] # This list can be any length, includes all the topics to record
+      - recorder_stop_offset
+    Outputs:

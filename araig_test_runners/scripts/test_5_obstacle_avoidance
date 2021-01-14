@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+import rospy
+from base.base_runner import TestBase
+
+""""
+BASE INTERFACES
+self._input_interface = {
+    "robot_has_stopped"    : "/signal/calc/robot_has_stopped",
+    "start_test"           : "/signal/ui/start_test",
+    "interrupt_test"       : "/signal/ui/interrupt_test"
+}
+
+self._output_interface = {
+    "start_robot"     : "/signal/runner/start_robot",
+    "test_completed"  : "/signal/runner/test_completed",
+    "test_failed"     : "/signal/runner/test_failed",
+    "test_succeeded"  : "/signal/runner/test_succeeded"
+}
+"""
+
+class Test5(TestBase):
+    def __init__(self, rate):
+        
+        extend_subscribers_dict = {
+            "goal"  : "/signal/calc/robot_reached_goal_and_stopped",
+            "robot_in_collision"  : "/signal/calc/robot_in_collision"
+        }
+        extend_publishers_dict = {
+        }
+
+        super(Test5, self).__init__(extend_subscribers_dict, extend_publishers_dict, rate = rate)
+        self.main()
+
+    def main(self):
+        rospy.loginfo(rospy.get_name() + ": Waiting to start...")
+
+        # Wait until start signal received
+        while not rospy.is_shutdown():
+            self._rate.sleep()
+            if self.getSafeFlag("start_test"):
+                self.startRecordingAndWait(3)
+                rospy.loginfo(rospy.get_name() + ": Starting robot.")
+                self._publishers["start_robot"].publish(self.buildNewBoolStamped(True))
+                break
+                
+        # wait until robot reaches goal
+        while not rospy.is_shutdown():
+            self._rate.sleep()
+
+            # If robot has stopped (because it found an obstacle)
+            if self.getSafeFlag("goal"):
+                rospy.loginfo(rospy.get_name() + ": Robot has reached goal, ending test in success!")
+                self._publishers["test_succeeded"].publish(self.buildNewBoolStamped(True))
+                break
+
+            # If robot collides with object
+            if self.getSafeFlag("robot_in_collision"):
+                rospy.loginfo(rospy.get_name() + ": Robot has collided, ending test in failure!")
+                self._publishers["test_failed"].publish(self.buildNewBoolStamped(True))
+                break
+
+            # If interrupted
+            if self.getSafeFlag("interrupt_test"):
+                rospy.logwarn(rospy.get_name() + ": Interrupted!! Exiting in failure")
+                self._publishers["test_failed"].publish(self.buildNewBoolStamped(True))
+                break
+                
+        self._publishers["test_completed"].publish(self.buildNewBoolStamped(True))
+
+if __name__ == "__main__":
+    try:
+        rospy.init_node("Test5_runner", disable_signals=True)
+        test = Test5(100)
+        rospy.spin()
+    except rospy.ROSException:
+        pass

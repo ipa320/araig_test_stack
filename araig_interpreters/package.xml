@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>araig_interpreters</name>
+  <version>1.0.0</version>
+  <description>Package to hold all interpreters used in ARAIG tests</description>
+
+  <maintainer email="tejas.kumar.shastha@ipa.fraunhofer.de">tejas</maintainer>
+
+  <license>Apache 2.0</license>
+
+  <author email="tejas.kumar.shastha@ipa.fraunhofer.de">tejas</author>
+  <author email="ruichao.wu@ipa.fraunhofer.de">ruichao</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>araig_msgs</depend>
+  <depend>marvelmind_nav</depend>
+  <depend>tf</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <export>
+  </export>
+</package>

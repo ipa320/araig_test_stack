@@ -1,0 +1,14 @@
+<launch>
+
+    <node pkg="araig_calculators" type="diff_pose_temporal_node" name="diff_pose_temporal_node" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+        <remap from="/in_pose" to="/test/pose"/>
+        <remap from="out_disp_angular" to="/test/out_disp_angular"/>
+        <remap from="out_disp_position" to="/test/out_disp_position"/>
+    </node>
+
+    <test test-name="test_diff_pose_temporal_node" pkg="araig_calculators" type="test_diff_pose_temporal_node.py">
+    </test>
+
+</launch>

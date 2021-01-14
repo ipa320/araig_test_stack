@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>araig_calculators</name>
+  <version>1.0.0</version>
+  <description>The araig_calculators package</description>
+
+  <maintainer email="ruichao.wu@ipa.fraunhofer.de">ruichao</maintainer>
+  
+  <author email="tejas.kumar.shastha@ipa.fraunhofer.de">tejas</author>
+  <author email="ruichao.wu@ipa.fraunhofer.de">ruichao</author>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>python-scipy</exec_depend>
+  <build_depend>rostest</build_depend>
+  <build_depend>roslint</build_depend>
+  <depend>rospy</depend>
+  <depend>araig_msgs</depend>
+  <exec_depend>rqt_multiplot</exec_depend>
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,22 @@
+# This file must be converted to nadias model to generate the launch file
+Bringup:
+  Rosparam:
+    file: "test1_params.yaml"
+  Launch:
+    - pkg: turtlebot3_bringup
+      launch: tb3_robot.launch
+  Node:
+    - pkg: araig_interpreters # Convert sensor data to location of robot
+      node: interpret_marvel_location
+      args : [Data.sensors.ips.location, Data.interpreter.location.robot]
+    - pkg: araig_interpreters # Convert Signal.runner.stop_robot & Signal.runner.start_robot to robot velocity commands
+      node: interpret_tb3_velocity
+      args: [Signal.runner.stop_robot, Signal.runner.start_robot, Data.interpreter.vel]
+    - pkg: rosgraph_monitor
+      node: monitor
+    - pkg: araig_user_interface
+      node: rqt_gui # Start ui from aulon's package and make it publish the button press signals to these signal topics
+      args: [Signal.ui.start_test, Signal.ui.abort_test]
+    - pkg: araig_test_runners # A.K.A Central Command Node.
+      node: test_1_runner.py
+      args:  [Signal.ui.start_test, Signal.ui.abort_test, Signal.runner.start_robot, Signal.runner.stop_robot]

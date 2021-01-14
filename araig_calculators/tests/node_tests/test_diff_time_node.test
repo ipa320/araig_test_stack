@@ -1,0 +1,11 @@
+<launch>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="diff_time_node" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+        <remap from="/out_duration" to="/test/duration"/>
+    </node>
+    <test test-name="test_diff_time_node" pkg="araig_calculators" type="test_diff_time_node.py">
+    </test>
+
+</launch>

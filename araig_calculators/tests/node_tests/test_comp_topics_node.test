@@ -1,0 +1,17 @@
+<launch>
+
+<group ns="/calculators/comp_topics_node">
+    <param name="tolerance" type="double" value="0" />
+</group>
+    
+    <node pkg="araig_calculators" type="comp_topics_node" name="comp_topics_node" output="screen">
+        <remap from="/in_bool_1" to="/test/in_bool_1"/>
+        <remap from="/in_bool_2" to="/test/in_bool_2"/>
+        <remap from="/out_bool" to="/test/out_bool"/>
+    </node>
+
+    <test test-name="test_comp_topics_node" pkg="araig_calculators" type="test_comp_topics_node.py">
+    </test>
+
+
+</launch>

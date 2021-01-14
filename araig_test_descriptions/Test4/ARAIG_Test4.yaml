@@ -1,0 +1,73 @@
+Test_num: 4 # Position accuracy in front of static obstacles
+Interfaces:
+  Raw_data: [
+    Robot.nav.location, # Location as reported by robot navigation S/W
+    Robot.nav.goal_status, # Goal status
+    Sensors.location # Ground truth location
+    # OPTIONAL interfaces
+    Robot.nav.status, # Navigation software status - planning, executing, obstacle detected etc.. PROBLEMATIC PART
+    ]
+  Events: [
+    Events.Robot.Start, # Robot should start moving
+    Events.Robot.Stop, # Robot should stop moving
+    Events.Robot.Is_stopped # Robot has stopped moving
+     ]
+
+Calculators:
+  Event_emitter: Location_accuracy_monitor
+    Inputs: [Robot.nav.location, Sensors.location]
+    Operation: Check the deviation between the two, warn if outside acceptable range <param_location_accuracy_threshold>
+    Outputs: Events.Test.Location_accuracy_unreliable OR Events.Test.Abort # This means that the navigation software is no longer reliable - COULD abort test.
+  Event_emitter: Navigation_is_done
+    Inputs: Robot.nav.goal_status
+    Operation: Calculate when robot nav action is done
+    Outputs: Events.Robot.goal.reached, Events.Robot.goal.failed
+  Timer: Time_to_goal
+    Inputs: [Events.Test.Goal, Events.Robot.goal.reached, Events.Robot.goal.failed]
+    Operation: Calculate time gap between between {Events.Test.Goal<->(Events.Robot.goal.reached OR Events.Robot.goal.failed)}
+    Outputs: Time duration in seconds # text output, save to file, 0 if failed
+  Displacement_calculator: Ground_truth_error
+    Inputs: [Sensors.location.robot, <param_goal_pose>, Events.Robot.goal.reached, Events.Robot.goal.failed]
+    Operation: Calculate distance between robot and goal pose when goal is reached/aborted
+    Outputs: Distance in meters # text output, save to file
+  Displacement_calculator: Perceived_error
+    Inputs: [Robot.nav.location, <param_goal_pose>, Events.Robot.goal.reached, Events.Robot.goal.failed]
+    Operation: Calculate distance between robot and goal pose when goal is reached/aborted
+    Outputs: Distance in meters # text output, save to file
+  # OPTIONAL calculators
+  Event_emitter: Navigation_planning_is_done
+  Event_emitter: Navigation_planning_has_started
+  Event_emitter: Navigation_obstacle_detected
+  Timing_calculator: Time_to_plan
+
+Interface_interpreters:
+  Location_interpreter: Convert sensor data to Sensors.location
+  Command_interpreter: Convert Events.Robot.Stop & Events.Robot.Is_stopped to robot velocity commands
+  Position_interpreter: Convert robot navigation position to Robot.nav.location
+  Goal_interpreter: Convert robot navigation goal action to Robot.nav.goal
+  Nav_interpreter: Convert robot navigation planning phases to emit events
+
+Parameters: [location_accuracy_threshold, goal_pose]
+
+Test_runner:
+  Concurrence_1: Run main test sequence
+    Sequence_1: Wait for Events.Test.Start
+    Sequence_2: Send <param_goal_pose> to nav goal
+    Sequence_3: Emit Events.Robot.Goal
+    Sequence_4: Wait for Events.Robot.goal.reached OR Events.Robot.goal.failed
+  Concurrence_2: Abort if necessary
+    Sequence_1: Wait for Events.Test.Abort
+    Sequence_2: Abort entire test
+
+UI_elements:
+  Inputs: [User_input.Start_test, User_input.Abort_test]
+  Display: [Text.time_to_goal, Text.Position_error]
+  Outputs: [Events.Test.Start, Events.Test.Abort]
+
+
+Orchestration:
+  Launch: All interpreters
+  Launch: Load all calculators
+  Launch: UI elements
+  Launch: Test_runner
+  

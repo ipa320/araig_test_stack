@@ -1,0 +1,89 @@
+Interfaces:
+  External:
+  # Data exchange with external sources such as robots, sensors, nav stack etc...
+  # Just enter the names of the topics published by these devices here, and they will be used further in the test
+  # This effectively serves as remapping through the auto-generation toolchain
+    Data:
+    # Robot
+      - name: Data.robot.odom.twist.x
+        topic: "/turtlebot3/odometry/twist/x"
+        type: std_msgs/Float64
+        description: "Specifically, the twist x value of odom"
+
+    # Sensors
+      - name: Data.sensors.ips.location
+        topic: "/marvelmind/beacon_pos"
+        type: geometry_msgs/PoseStamped
+        description: "Data arriving from the Indoor Positioning System (IPA) about the location of beacon. This should be passed to the location interpreter"
+      - name: Data.sensors.camera
+        topic: "/realsense/rgb"
+        type: sensor_msgs/Image
+        description: "RGB images published by the realsense camera"
+
+    # Interpreters
+      - name: Data.interpreter.goal
+        topic: "/turtlebot3/goal_pose"
+        type: geometry_msgs/PoseStamped
+        description: "The on which the goal pose is published. Could be an action too."
+
+  Internal:
+    Data:
+      # Interpreters
+      - name: Data.interpreter.location.robot
+        topic: "/data/interpreter/location/robot"
+        type: geometry_msgs/PoseStamped
+        description: "The sensor data is interpreted and the pose of the robot is published on this topic"
+      - name: Data.interpreter.location.obstacle
+        topic: "/data/interpreter/location/obstacle"
+        type: geometry_msgs/PoseStamped
+        description: "The sensor data is interpreted and the pose of the obstacle is published on this topic"
+
+      # Calculators
+      - name: Data.calc.goal_time
+        topic: "/data/calculators/goal_time/duration"
+        type: std_msgs/Double
+        description: "Time taken by the robot to reach goal after it is published"
+
+    Signals:
+      # Calculators
+      - name: Signal.calc.robot_has_stopped
+        topic: "/Signals/calculators/robot_has_stopped"
+        type: std_msgs/Bool
+        description: "An Signal raised when robot reaches velocity 0"
+      - name: Signal.calc.robot_in_collission
+        topic: "/Signals/calculators/robot_in_collision"
+        type: std_msgs/Bool
+        description: "An Signal raised when robot breaches collision zone of obstacle"
+      - name: Signal.calc.robot_reached_goal
+        topic: "/Signals/calculators/robot_reached_goal"
+        type: std_msgs/Bool
+        description: "An Signal raised when robot reaches goal"
+      - name: Signal.calc.robot_reached_goal_and_stopped
+        topic: "/Signals/calculators/robot_reached_goal_and_stopped"
+        type: std_msgs/Bool
+        description: "An Signal raised when robot reaches goal and stops"
+
+      # Runner
+      - name: Signal.runner.start_robot
+        topic: "/Signal/runner/start_robot"
+        type: std_msgs/Bool
+        description: "Signal raised by runner to start the robot. Consumed by goal interpreter to then publish goal"
+      - name: Signal.runner.test_failed
+        topic: "/Signal/runner/test_failed"
+        type: std_msgs/Bool
+        description: "Signal raised by runner when test has failed"
+      - name: Signal.runner.test_succeeded
+        topic: "/Signal/runner/test_succeeded"
+        type: std_msgs/Bool
+        description: "Signal raised by runner when test has succeeded"
+
+      # UI
+      - name: Signal.ui.start_test
+        topic: "/Signal/ui/start_test/start"
+        type: std_msgs/Bool
+        description: "Signal raised by UI to start the test script. Consumed by runner"
+      - name: Signal.ui.abort_test
+        topic: "/Signal/ui/abort_test/abort"
+        type: std_msgs/Bool
+        description: "Signal raised by UI to abort the test script. Consumed by runner"
+

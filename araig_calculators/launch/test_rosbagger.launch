@@ -1,0 +1,10 @@
+<launch>        
+
+    <rosparam command="load" file="$(find araig_calculators)/config/test_calculators.yaml" />
+
+    <node pkg="araig_calculators" type="rosbagger_node" name="test_bagger" output="screen" >
+        <remap from="/start" to="/signal/runner/start_recording"/>
+        <remap from="/stop" to="/signal/runner/test_completed"/>
+    </node>
+
+</launch>

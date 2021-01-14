@@ -1,0 +1,76 @@
+Calculators:
+  - type: Comparator
+    Name: robot_has_stopped
+    Description: Calculate when robot has stopped
+    Inputs:
+      Data:
+        - Data.robot.odom.twist.x
+    Parameters:
+      - Param.vel_zero
+    Outputs:
+      Signals:
+        - Signal.calc.robot_has_stopped
+
+  - type: PoseComparator
+    Name: robot_in_collission
+    Description: Check if the robot has collided with the obstacle
+    Inputs:
+      Data:
+        - Data.interpreter.location.robot
+        - Data.interpreter.location.obstacle
+      Signals:
+    Parameters:
+      - Param.collission_radius
+    Outputs:
+      Signals:
+        - Signal.calc.robot_in_collission
+
+  - type: PoseComparator
+    Name: robot_reached_goal
+    Description: Calculate if robot reaches goal
+    Inputs:
+      Data:
+        - Data.interpreter.location.robot
+        - Data.xx.goal # This is still not solved. If param, we need a second type/feature of PoseComparator
+    Parameters:
+      - Param.goal_threshold
+    Outputs:
+      Signals:
+        - Signal.calc.robot_reached_goal
+
+  - type: ANDGate # Will not work unless perfectly timed. Change Signals to Signals (i.e. Change pulse to level shift)
+    Name: goal_and_stop
+    Description: Tell when the test has to end so that final result can be tallied
+    Inputs:
+      Signals:
+        - Signal.calc.robot_has_stopped
+        - Signal.calc.robot_reached_goal
+    Parameters:
+    Outputs:
+      Signals:
+        - Signal.calc.robot_reached_goal_and_stopped
+
+  - type: Timer
+    name: goal_time
+    Description: Calculate time to reach goal
+    Inputs:
+      Signals:
+        - Signal.runner.start_robot
+        - Signal.calc.robot_reached_goal_and_stopped
+    Parameters:
+      - Param.save_filename
+    Outputs:
+      Data:
+        - Data.calc.goal_time
+
+  - type: Rosbagger
+    name: bag_video
+    Description: Record the video stream
+    Inputs:
+      - Signals.ui.start_test
+      - Signals.runner.test_completed
+    Parameters:
+      - Param.save_filename
+      - [Data.sensors.camera] # This list can be any length, includes all the topics to be record
+      - Param.recorder_stop_offset
+    Outputs:

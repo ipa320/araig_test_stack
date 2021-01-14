@@ -1,0 +1,17 @@
+calculators:
+  file_prefix: "test" # All calculators will prefix this to filenames that they write to.
+
+  test_comp_param_node: # node name 
+    param: 0.0
+    tolerance: 0.5
+
+  test_comp_poses_node: # node name 
+    pose_tolerance: 0.0
+    orientation_tolerance: None
+  
+  test_comp_topics_node: # node name 
+    tolerance: 0
+
+  test_bagger:
+    dest_dir: "/home/tejas/araig/bags" # Full path required. Saves bags here.
+    stop_offset: 2 # Wait these many seconds before killing

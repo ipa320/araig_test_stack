@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+import rospy
+from geometry_msgs.msg import PoseStamped
+
+from araig_msgs.msg import BoolStamped
+from comparators.comp_poses import compPoses
+
+
+        
+if __name__ == "__main__":
+    rospy.init_node("comparater")
+
+    module_name = "/calculators"
+    ns = module_name + rospy.get_name()
+
+    comparater_pose = compPoses(delta_pos_thresh_meters = rospy.get_param(ns +"/pose_tolerance"),
+                                    delta_theta_thresh_degrees = rospy.get_param(ns +"/orientation_tolerance"),
+                                    rate = 100)

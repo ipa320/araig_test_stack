@@ -1,0 +1,17 @@
+<launch>
+
+<group ns="/calculators/test_comp_param_node">
+    <param name="param" type="double" value="0.5" />
+    <param name="tolerance" type="double" value="0.01" />
+</group>
+    
+    <node pkg="araig_calculators" type="comp_param_node" name="test_comp_param_node" output="screen">
+        <remap from="/in_float" to="/test/in_float"/>
+        <remap from="/out_bool" to="/test/out_bool"/>
+    </node>
+
+    <test test-name="test_comp_param" pkg="araig_calculators" type="test_comp_param_node.py">
+    </test>
+
+
+</launch>
