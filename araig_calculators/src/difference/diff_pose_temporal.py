@@ -79,7 +79,7 @@ class diffPoseTemporal(BaseCalculator):
 
                 self._prestate_stop = temp[self._sub_topic_stop].data
             
-        if self._posestamp_start != None and self._posestamp_stop != None and self._flag_get_result == False:
+        if self._posestamp_start != None and self._posestamp_stop != None: #and self._flag_get_result == False:
             delta_x = abs(self._posestamp_start.pose.position.x - self._posestamp_stop.pose.position.x)
             delta_y = abs(self._posestamp_start.pose.position.y - self._posestamp_stop.pose.position.y)
 
@@ -89,6 +89,6 @@ class diffPoseTemporal(BaseCalculator):
 
             self.PubDiag[self._pub_topic_angular].publish(self._pub_msg_angular)
             self.PubDiag[self._pub_topic_position].publish(self._pub_msg_position)
-            rospy.loginfo("{}: Delta angle is {}".format(rospy.get_name(), self._pub_msg_angular))
-            rospy.loginfo("{}: Delta position is {}".format(rospy.get_name(), self._pub_msg_position))
-            self._flag_get_result = True
+            #rospy.loginfo("{}: Delta angle is {}".format(rospy.get_name(), self._pub_msg_angular))
+            #rospy.loginfo("{}: Delta position is {}".format(rospy.get_name(), self._pub_msg_position))
+            #self._flag_get_result = True
