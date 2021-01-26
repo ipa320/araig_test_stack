@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation
 if __name__ == "__main__":
     rospy.init_node('goal_interpreter')
     module_name = "/interpreters"
-    ns = module_name + rospy.get_name()
+    ns = module_name 
     config_goal = ns + "/goal"
     config_goal_action_name = ns + "/goal_action"
     config_time_wait_action = ns + "/wait_action"
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     goal.target_pose.pose.position.z = rospy.get_param(config_goal + '/position/z')
 
     yaw = rospy.get_param(config_goal + '/yaw')
-    rot = Rotation.from_euler('xyz', [0, 0, yaw], degrees=True)
+    rot = Rotation.from_euler('xyz', [0, 0, yaw], degrees=False)
     q = rot.as_quat()
 
     goal.target_pose.pose.orientation.x = q[0]
@@ -35,6 +35,8 @@ if __name__ == "__main__":
 
     if goal_action_name != "None":
         time_wait_action = rospy.get_param(config_time_wait_action)
+    else:
+        time_wait_action = 0 
     
     rate = rospy.get_param(config_rate)
 
