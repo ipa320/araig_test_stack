@@ -2,6 +2,8 @@
 import sys
 import rospy
 import threading
+import yaml
+import os
 
 """supprot subscribe mix 3 topics
     if need more, only need to add as
@@ -44,6 +46,16 @@ class BaseCalculator(object):
         if rate == None:
             rospy.logerr("{}:  Please provide rate".format(rospy.get_name()))
         self._rate = rospy.Rate(rate)
+
+        module_name = "/calculators"
+        ns = module_name + rospy.get_name()
+        IF_LOG = "/if_log"
+        self.log_msg = {}
+
+        self.log_filename = ""
+        if rospy.has_param(ns + IF_LOG) and rospy.get_param(ns + IF_LOG) == True:
+            self.log_filename = "log_" + rospy.get_name().replace('/', '') + ".yaml"
+            
 
         self.SubDict = sub_dict
         self.PubDict = pub_dict
@@ -102,13 +114,63 @@ class BaseCalculator(object):
                 rospy.loginfo(log)
             return True
         return True
+    
+    def get_logfile_path(self):
+        DEST_DIR = "/dest_dir"
+        ROBOT_TYPE = "/robot_type"
+        TEST_TYPE = "/test_type"
+
+        module_name = "/calculators"
+
+        if rospy.has_param(module_name + DEST_DIR):
+            dest_dir = rospy.get_param(module_name + DEST_DIR)
+        else:
+            rospy.logerr("{} param not set!!".format(module_name + DEST_DIR))
+            sys.exit()
+
+        if not os.path.exists(dest_dir):    
+            rospy.logwarn(rospy.get_name() + ": " + dest_dir + " did not exist, trying to create it. Verify it exists before continuing.")
+
+        if rospy.has_param(module_name + ROBOT_TYPE):
+            robot_type = rospy.get_param(module_name + ROBOT_TYPE)
+        else:
+            rospy.logerr("{} param not set!!".format(module_name + ROBOT_TYPE))
+            sys.exit()
+
+        if rospy.has_param(module_name + TEST_TYPE):
+            test_type = rospy.get_param(module_name + TEST_TYPE)
+        else:
+            rospy.logerr("{} param not set!!".format(module_name + TEST_TYPE))
+            sys.exit()
+
+        pathFolder = dest_dir + "/" + robot_type + "/" + test_type + "/"
+        try: 
+            size = len(os.listdir(pathFolder))
+            num = str(size)
+            currentFolder = pathFolder + num + "/"
+            filepath = currentFolder + self.log_filename
+            return filepath
+
+        except OSError as err:
+            rospy.logerr_once(rospy.get_name() + ": os error msg: " + str(err))
+
+    def login_file(self, log_msg):
+        rospy.loginfo("{}: Writing result into {}".format(rospy.get_name(), self.get_logfile_path()))
+        try:
+            open(self.get_logfile_path(), 'a+')
+
+        except OSError as err:
+             with open(self.get_logfile_path(), 'w+') as yaml_file:
+                yaml.dump(log_msg, yaml_file, default_flow_style=False)
+
+        else:
+            with open(self.get_logfile_path(), 'a+') as yaml_file:
+                yaml.dump(log_msg, yaml_file, default_flow_style=False)
 
     def main(self):
         try:
             while not rospy.is_shutdown():        
-                
                 self.calculate() 
                 self._rate.sleep()
-
         except rospy.ROSException:
             pass    
