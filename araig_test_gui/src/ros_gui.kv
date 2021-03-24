@@ -1,0 +1,35 @@
+FloatLayout:
+
+    MDLabel:
+        id: my_label
+        text: "ARAIG"
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .5, "center_y": 0.9}
+
+    MDRaisedButton:
+        text:"Start"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .1, "center_y": 0.7}
+        on_press: app.my_function(*args)
+    MDRaisedButton:
+        text:"Interrupt"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .3, "center_y": 0.7}
+
+    MDRaisedButton:
+        text:"Signal"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .6, "center_y": 0.7}
+    MDRaisedButton:
+        text:"MSG"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .8, "center_y": 0.7}
+    MDRaisedButton:
+        text:"Signal"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .6, "center_y": 0.5}
+    MDRaisedButton:
+        text:"MSG"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .8, "center_y": 0.5}
