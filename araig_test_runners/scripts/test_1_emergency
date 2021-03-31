@@ -2,7 +2,6 @@
 import rospy
 from base.base_runner import TestBase
 import enum
-import sys
 
 """"
 BASE INTERFACES
@@ -28,21 +27,18 @@ self._output_interface = {
 class State(enum.Enum):
     wait = 1
     start_test = 2
-    robot_has_max_vel = 3
+    emergency = 3
     complete_test = 4
-    check_condition = 5
 
 class Test1(TestBase):
     def __init__(self, rate):
         
         extend_subscribers_dict = {
-            "robot_has_max_vel"  : "/signal/calc/robot_has_max_vel",
+            "emergency"            : "/signal/robot/emergency",
         }
         extend_publishers_dict = {
-            "stop_robot"           : "/signal/runner/stop_robot",
         }
         extend_param_list = {
-            "timeout_after_max_speed",
             "timeout_after_complete",
         }
 
@@ -59,7 +55,7 @@ class Test1(TestBase):
             rospy.loginfo(rospy.get_name() + ": Waiting to start...")
             self.pre_state = State.wait
         
-        # Wait until /signal/ui/start_test received
+        # Wait until start signal received
         if self.current_state == State.wait and self.getSafeFlag("start_test"):
             self.startRecordingAndWait(3)
             rospy.loginfo(rospy.get_name() + ": Starting robot.")
@@ -67,27 +63,14 @@ class Test1(TestBase):
             self.current_state = State.start_test
             self.pre_state = State.start_test
         
-        # If robot has reached max velocity, but need to check if it really reached
-        if self.current_state == State.start_test and self.getSafeFlag("robot_has_max_vel"):
-            rospy.loginfo(rospy.get_name() + ": Robot has max velocity, after waiting for {}s, check again.".format(self.config_param['timeout_after_max_speed']))
-            self.current_state = State.check_condition
-        
-        if self.pre_state == State.start_test and  \
-            self.current_state == State.check_condition:
-            if self.getSafeFlag("robot_has_max_vel"):
-                if self.checkCondition(self.getSafeFlag("robot_has_max_vel", header = True).stamp, \
-                    self.config_param['timeout_after_max_speed']):
-                    rospy.loginfo(rospy.get_name() + ": Robot has reached max velocity, stopping now.")
-                    # Stop robot
-                    self._publishers["start_robot"].publish(self.buildNewBoolStamped(False))
-                    self._publishers["stop_robot"].publish(self.buildNewBoolStamped(True))
-                    self.current_state = State.robot_has_max_vel
-            else:
-                rospy.loginfo(rospy.get_name() + ": Robot did not keep max velocity, waiting for robot reach again")
-                self.current_state = State.start_test
+        # If get emergency signal from robot
+        if self.current_state == State.start_test and self.getSafeFlag("emergency"):
+            rospy.loginfo(rospy.get_name() + ": Robot start emergency braking now.")
+            self._publishers["start_robot"].publish(self.buildNewBoolStamped(False))
+            self.current_state = State.emergency
 
         #  Wait until robot actually stops
-        if self.current_state == State.robot_has_max_vel and self.getSafeFlag("robot_has_stopped"):
+        if self.current_state == State.emergency and self.getSafeFlag("robot_has_stopped"):
             rospy.loginfo(rospy.get_name() + ": Robot has completely stopped. Test succeeded and completed!")
             # Set test succeeded & test completed true
             self._publishers["test_succeeded"].publish(self.buildNewBoolStamped(True))
@@ -96,12 +79,10 @@ class Test1(TestBase):
 
         # If interrupted
         if self.getSafeFlag("interrupt_test") and self.pre_state == State.start_test:
-            rospy.logwarn(rospy.get_name() + ": Interrupted!! Test failed")
+            rospy.logwarn(rospy.get_name() + ": Interrupted!!")
             self._publishers["start_robot"].publish(self.buildNewBoolStamped(False))
             self._publishers["test_failed"].publish(self.buildNewBoolStamped(True))
             self._publishers["test_completed"].publish(self.buildNewBoolStamped(True))
-            # !!! ui should publish interrupt_test to False after pub True, interrupt_test signal is event 
-            self._publishers["interrupt_test"].publish(self.buildNewBoolStamped(False))
             self.current_state = State.complete_test
 
         # If test complete, wait for "timeout_after_complete" s, then enable reset 
@@ -116,18 +97,17 @@ class Test1(TestBase):
 
         if self.current_state == State.wait and self.pre_state == State.complete_test and self.getSafeFlag("reset_test"):
             self._publishers["start_robot"].publish(self.buildNewBoolStamped(False))
-            self._publishers["stop_robot"].publish(self.buildNewBoolStamped(False))
             self._publishers["test_failed"].publish(self.buildNewBoolStamped(False))
             self._publishers["test_succeeded"].publish(self.buildNewBoolStamped(False))
             self._publishers["test_completed"].publish(self.buildNewBoolStamped(False))
-            # !!! ui should set reset_test to False after set to True, reset signal is an event
+            # !!! ui should publish reset_test to False after pub True, reset signal is event
             self._publishers["reset_test"].publish(self.buildNewBoolStamped(False))
-            rospy.logwarn(rospy.get_name() + ": user has reset test")
+            rospy.logwarn(rospy.get_name() + ": user reset test")
             self.pre_state = None
 
 if __name__ == "__main__":
     try:
-        rospy.init_node("test1_runner", disable_signals=True)
+        rospy.init_node("test1_emergency_runner", disable_signals=True)
         test = Test1(100)
     except rospy.ROSException:
         pass
