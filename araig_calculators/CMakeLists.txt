@@ -18,7 +18,7 @@ catkin_install_python(PROGRAMS
    scripts/comp_param_node
    scripts/comp_poses_node
    scripts/comp_topics_node
-   scripts/rosbagger_node
+   scripts/folder_bagger_node
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
