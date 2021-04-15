@@ -5,6 +5,8 @@ from araig_msgs.msg import BoolStamped, Float64Stamped
 import threading
 import sys
 import os
+from .base import getRootFolder
+
 class BaseLogger(object):
     def __init__(self, sub_dict = {}, result_list = [], param_list = [], rate = 100):
         self._rate = rospy.Rate(rate)
@@ -37,7 +39,7 @@ class BaseLogger(object):
             self._flag[topic] = Float64Stamped()
             self._flag[topic].data = float("inf")
         
-        self.pathFolder = self.getRootFolder()
+        self.pathFolder = getRootFolder()
 
     def setSafeFlag(self, key, value):
         if not key in self._input_interface.keys() and not key in self.result_list:
@@ -67,46 +69,19 @@ class BaseLogger(object):
     def killCommandProc(self):
         self.command_proc.send_signal(subprocess.signal.SIGINT)
         rospy.loginfo(rospy.get_name() + ": Destructor killing process {}!".format(self.command_proc))
-    
-    def getRootFolder(self):
-        DEST_DIR = "/dest_dir"
-        ROBOT_TYPE = "/robot_type"
-        TEST_TYPE = "/test_type"
-
-        module_name = "/calculators"
-
-        if rospy.has_param(module_name + DEST_DIR):
-            dest_dir = rospy.get_param(module_name + DEST_DIR)
-        else:
-            rospy.logerr("{} param not set!!".format(module_name + DEST_DIR))
-            sys.exit()
-
-        if not os.path.exists(dest_dir):    
-            rospy.logwarn(rospy.get_name() + ": " + dest_dir + " did not exist, trying to create it. Verify it exists before continuing.")
-
-        if rospy.has_param(module_name + ROBOT_TYPE):
-            robot_type = rospy.get_param(module_name + ROBOT_TYPE)
-        else:
-            rospy.logerr("{} param not set!!".format(module_name + ROBOT_TYPE))
-            sys.exit()
-
-        if rospy.has_param(module_name + TEST_TYPE):
-            test_type = rospy.get_param(module_name + TEST_TYPE)
-        else:
-            rospy.logerr("{} param not set!!".format(module_name + TEST_TYPE))
-            sys.exit()
-        
-        path_folder = dest_dir + "/" + robot_type + "/" + test_type + "/"
-        return path_folder
 
     def getSubFolder(self):
         try: 
             size = len(os.listdir(self.pathFolder))
             num = str(size)
             currentFolder = self.pathFolder + num
-            return currentFolder
         except OSError:
-            rospy.logerr_once("%s: Can't find the folder: %s", rospy.get_name(), currentFolder)
+            rospy.logerr_once("%s: Can't find the folder: %s, will create it", rospy.get_name(), currentFolder)
+            try:
+                os.mkdir(currentFolder)
+            except OSError:
+                os.makedirs(currentFolder)
+        return currentFolder
     
     def getConfig(self, param_list):
         for arg in param_list:
