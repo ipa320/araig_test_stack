@@ -76,7 +76,7 @@ class Led(Image):
             # set color to white when led_type = 'source'
             self.color = [1,1,1,1]
 
-class TutorialApp(MDApp):
+class App(MDApp):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -92,19 +92,24 @@ class TutorialApp(MDApp):
             if "led_" in k:
                 self.root.ids[k].toggle_state()
     
-    def my_function(self,*args):
-        print("button pressed")
-
-        self.screen.ids.my_label.text='button pressed'
-
+    def press_start(self,*args):
+        print("Start button pressed")
         msg=True
         pub.publish(msg)
+        self.root.ids['led_animated'].toggle_state()
+        #self.root.ids['led_typeboth1'].toggle_state()
+        #self.root.ids['led_typeboth2'].toggle_state()
 
-
+    def press_interrupt(self,*args):
+        print("Interrupt button pressed")
+        msg=True
+        pub.publish(msg)
+        self.root.ids['led_animated'].set_off()
+        self.root.ids['led_typeboth1'].toggle_state()
 
 if __name__ == '__main__':
 
     pub=rospy.Publisher('/button',Bool,queue_size=1)
     rospy.init_node('simple_gui',anonymous=True)
-    TutorialApp().run()
+    App().run()
     
