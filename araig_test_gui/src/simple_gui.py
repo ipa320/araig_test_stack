@@ -93,6 +93,39 @@ class App(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.screen=Builder.load_file('ros_gui.kv')
+    
+        """ rospy.Subscriber('/signal/runner/test_completed', callback_test_completed)
+        self.mutex_lock = threading.lock()
+        self.completed
+
+        rospy.Subscriber('/signal/runner/test_succeeded', callback_test_succeeded)
+        self.mutex_lock_2 = threading.lock()
+        self.succeeded  """
+
+    def callback_test_completed(self, msg):
+        with self.mutex_lock():
+            self.completed = msg.data
+
+    def callback_test_succeeded(self, msg):
+        with self.mutex_lock_2():
+            self.succeeded = msg.data
+
+    def update_led(self):
+        with self.mutex_lock_2():
+            succ = self.succeeded
+
+        with self.mutex_lock_3():
+            fail = self.failed
+
+        if succ:
+            print('succ')
+            #my_led.color = green 
+        elif fail:
+            print('fail')
+            #my_led.color = red 
+        else:
+            print('nothing changed')
+            #my_led.color = gray
 
     def build(self):
         return self.screen
@@ -103,10 +136,13 @@ class App(MDApp):
                 self.root.ids[k].toggle_state()
     
     def press_start(self,*args):
-        print("Start button pressed")
+       
+        print(self.testsetup +" has been started")
+        print(self.testsetup[-1])
         msg=True
         pub.publish(msg)
         self.root.ids['led_animated'].toggle_state()
+           
         #self.root.ids['led_typeboth1'].toggle_state()
         #self.root.ids['led_typeboth2'].toggle_state()
 
@@ -117,8 +153,11 @@ class App(MDApp):
         self.root.ids['led_animated'].set_off()
         self.root.ids['led_typeboth1'].toggle_state()
 
-    def spinner_clicked(self, *args):
-        print("klicked something")
+    def spinner_clicked(self,value):
+        print('You chose '+value)
+        self.testsetup=value
+
+       # self.root.ids['spinner_id']
        # self.root.ids['spinner_clicked']
 
 
