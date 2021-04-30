@@ -5,6 +5,8 @@ from kivymd.app import MDApp
 from kivy.clock import Clock
 from kivy.uix.image import Image
 from kivy.lang import Builder
+from kivy.uix.widget import Widget
+import threading
 from kivy.properties import ListProperty, OptionProperty, BooleanProperty, NumericProperty, StringProperty
 
 class Led(Image):
@@ -76,12 +78,20 @@ class Led(Image):
             # set color to white when led_type = 'source'
             self.color = [1,1,1,1]
 
+# class Spinner(Widget):
+
+#    def __init__(self, **kwargs):
+#        super().__init__(**kwargs)
+#        # force setting according to off state
+#        self.on_state(None,'off')
+
+#    def spinner_clicked(self)    
+
+
 class App(MDApp):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-
         self.screen=Builder.load_file('ros_gui.kv')
 
     def build(self):
@@ -106,6 +116,11 @@ class App(MDApp):
         pub.publish(msg)
         self.root.ids['led_animated'].set_off()
         self.root.ids['led_typeboth1'].toggle_state()
+
+    def spinner_clicked(self, *args):
+        print("klicked something")
+       # self.root.ids['spinner_clicked']
+
 
 if __name__ == '__main__':
 

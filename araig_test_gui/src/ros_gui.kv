@@ -5,7 +5,6 @@ FloatLayout:
         halign: "center"
         size_hint: 1, 1
         pos_hint: {"center_x": .5, "center_y": 0.9}
-
     MDRaisedButton:
         text:"Start"
         size_hint: 0.1, 0.1
@@ -41,3 +40,17 @@ FloatLayout:
         source_off: 'shapes/basic_disc.png'
         color_off: [0,0,0,1]
         color_on: [0,1,0,1]
+    MDLabel: 
+        id: click_label
+        text: "Pick Testing Setup:"
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .3, "center_y": 0.5}
+        
+    Spinner:
+        id: spinner_id
+        size_hint: 0.2, 0.1
+        pos_hint: {"center_x": .5, "center_y": 0.5}
+        text: "Testsetup"
+        values: ["Testsetup 1", "Testsetup 2","Testsetup 3", "Testsetup 4", "Testsetup 5"]
+        on_text: app.spinner_clicked(*args)
