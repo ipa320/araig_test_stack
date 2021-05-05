@@ -5,7 +5,7 @@
     <rosparam command="load" file="$(find turtlebot3_sim_tests)/config/test1_braking.yaml" />
     <param name="/calculators/dest_dir" value="$(arg dest_dir)" />
 
-    <node pkg="araig_calculators" type="folder_bagger_node" name="test_folder_bagger_node" output="screen" >
+    <node pkg="araig_calculators" type="folder_bagger_node" name="folder_bagger_node" output="screen" >
         <remap from="/start" to="/signal/runner/start_robot"/>
         <remap from="/stop" to="/signal/runner/test_completed"/>
         <remap from="/test_failed" to="/signal/runner/test_failed"/>

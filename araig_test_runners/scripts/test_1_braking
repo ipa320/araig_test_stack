@@ -11,7 +11,8 @@ self._input_interface = {
     "robot_has_stopped"    : "/signal/calc/robot_has_stopped",
     "start_test"           : "/signal/ui/start_test",
     "interrupt_test"       : "/signal/ui/interrupt_test",
-    "reset_test"           : "/signal/ui/reset_test"
+    "reset_test"           : "/signal/ui/reset_test",
+    "began_recording"      : "/signal/logger/begin_write"
 }
 # pub
 self._output_interface = {
@@ -30,7 +31,7 @@ class Test1(TestBase):
     def __init__(self, rate):
         
         extend_subscribers_dict = {
-            "robot_has_max_vel"  : "/signal/calc/robot_has_max_vel",
+            "robot_has_max_vel"  : "/signal/calc/robot_has_max_vel"
         }
         extend_publishers_dict = {
         }
@@ -47,8 +48,9 @@ class Test1(TestBase):
         rate = rate)
 
     def main(self):
-        # Standard startup, robot started on return
-        self.standardStartupSequence()
+        # Standard startup, robot started on return True, or recorder failed on return False
+        if not self.standardStartupSequence():
+            return
 
         # Sleep for some time to allow speed burst to settle
         if self.sleepUninterruptedFor(self.config_param['stabilization_timeout']) == self._RETURN_CASE_INTERRUPTED:
