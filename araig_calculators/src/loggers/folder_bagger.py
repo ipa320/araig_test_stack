@@ -9,26 +9,6 @@ import threading
 from datetime import datetime
 from std_msgs.msg import String
 import os
-
-def get_folder_name(root):
-    try: 
-        os.listdir(root)
-    except OSError as err:
-        if err.errno == 2:
-            os.makedirs(root) 
-    
-    size = len(os.listdir(root))
-    size += 1
-    folder_name = root + str(size)
-    return folder_name
-
-def create_folder(folder_name):
-    try:
-        os.mkdir(folder_name)
-        rospy.loginfo(rospy.get_name() + ": Successfully created the directory " + folder_name)
-    except OSError as err:
-        rospy.logerr(rospy.get_name() + ": Failed to create " + folder_name + ", error msg: "+ str(err))
-
 class FolderBagger(BaseLogger):
     def __init__(self):
 
