@@ -31,7 +31,6 @@ class TestBase(object):
         }
         self._output_interface.update(pub_dict)
         self._config_param = [
-            "start_logging_offset",
             ]
         self._config_param += param_list
 
@@ -138,18 +137,9 @@ class TestBase(object):
         rospy.logwarn(rospy.get_name() + ": Waiting to start...")
         self.loopFallbackOnFlags(["start_test"])
 
-        # Start received, wait for recorders to boot up. Cannot be interrupted.
-        rospy.logwarn(rospy.get_name() + ": Start received, waiting max {}s for recorder init"
-                        .format(self.config_param['start_logging_offset']))
-        result = self.timedLoopFallbackOnFlags(["began_recording"],self.config_param['start_logging_offset'])
-        if result == self._RETURN_CASE_INTERRUPTED:
-            return False
-        elif result == self._RETURN_CASE_TIMED_OUT:
-            rospy.logwarn(rospy.get_name() + ": Recorder did not start in expected time, aborting!!")
-            self.testFailed()
-            # TODO: Emulating UI responsibility Remove this once UI is integrated.
-            self._publishers["start_test"].publish(self.buildNewBoolStamped(False))
-            self.waitForReset()
+        # Start received, wait for recorder to boot up. Potentially infinite loop, can be interrupted.
+        rospy.logwarn(rospy.get_name() + ": Start received, waiting for recorder init")
+        if self.loopFallbackOnFlags(["began_recording"]) == self._RETURN_CASE_INTERRUPTED:
             return False
 
         # Start robot

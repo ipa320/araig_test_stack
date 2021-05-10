@@ -44,7 +44,7 @@ class Test4(TestBase):
         rate = rate)
 
     def main(self):
-        # Standard startup, robot started on return True, or recorder failed on return False
+        # Standard startup, robot started on return True, or interrupted on return False
         if not self.standardStartupSequence():
             return
 

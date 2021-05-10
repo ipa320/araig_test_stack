@@ -1,5 +1,4 @@
 runner:
-    start_logging_offset: 10
     acceleration_timeout: 2
     decceleration_timeout: 4
     emergency_wait_timeout: 3.5

@@ -1,5 +1,4 @@
 runner:
-  start_logging_offset: 2
   verification_timeout: 0.25
   goal_reach_timeout: 18
   

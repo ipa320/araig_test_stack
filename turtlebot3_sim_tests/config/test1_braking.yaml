@@ -1,5 +1,4 @@
 runner:
-  start_logging_offset: 10
   stabilization_timeout: 0.25
   acceleration_timeout: 2
   verification_timeout: 0.25
