@@ -10,7 +10,7 @@
   <license>Apache 2.0</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-
+  <exec_depend>araig_test_gui</exec_depend>
   <exec_depend>araig_calculators</exec_depend>
   <exec_depend>araig_interpreters</exec_depend>
   <exec_depend>araig_msgs</exec_depend>
