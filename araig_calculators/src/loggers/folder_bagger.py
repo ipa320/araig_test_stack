@@ -33,7 +33,7 @@ class FolderBagger(BaseLogger):
         # Optional whitelist topics that are test specific
         self.whitelist = self.whitelist + self.config_param[self.node_name + "/whitelist"]
 
-        self.begin_write_pub = rospy.Publisher('/signal/logger/begin_write', BoolStamped, queue_size=10, latch=True)
+        self.begin_write_pub = rospy.Publisher('/out_begin_write', BoolStamped, queue_size=10, latch=True)
 
         try:
             while not rospy.is_shutdown():
