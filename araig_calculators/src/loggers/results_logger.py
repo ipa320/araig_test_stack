@@ -57,6 +57,9 @@ class ResultsLoggerClass(BaseLogger):
 
         if start == True and stop == True:
             if test_succeeded == True:
+                # Wait for folder to be created before starting
+                rospy.loginfo(rospy.get_name() + ": Start received. Sleep {}s to prepare..."
+                    .format(self.config_param[self.node_name + "/start_offset"]))
                 rospy.sleep(self.config_param[self.node_name + "/start_offset"])
                 result = {}
                 for topic in self.result_topics_list:

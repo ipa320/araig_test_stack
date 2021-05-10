@@ -54,6 +54,7 @@ class TimeSeriesLoggerClass(BaseLogger):
             self._rate.sleep()
             start = self.getSafeFlag("start")
 
+        # Wait for folder to be created before starting
         rospy.loginfo(rospy.get_name() + ": Start recevied. Sleep {}s to prepare"
                         .format(self.config_param[self.node_name + "/start_offset"]))
         rospy.sleep(self.config_param[self.node_name + "/start_offset"])

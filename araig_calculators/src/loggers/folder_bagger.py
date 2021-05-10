@@ -95,7 +95,8 @@ class FolderBagger(BaseLogger):
             dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
 
             root_folder = get_root_folder()
-            
+
+            # Wait for folder to be created before starting recording
             rospy.loginfo(rospy.get_name() + ": Start received. Sleep {}s to prepare..."
                 .format(self.config_param[self.node_name + "/start_offset"]))
             
