@@ -178,7 +178,7 @@ class App(MDApp):
         pub1.publish(msg)
 
         self.root.ids['led_animated'].set_on()
-
+# Interrupt should make start false
     def press_interrupt(self,*args):
 
         msg=BoolStamped()
@@ -190,13 +190,17 @@ class App(MDApp):
         #self.root.ids['led_animated'].set_off()
         #self.root.ids['led_typeboth1'].toggle_state()
     
-    
+  # Reset should make all others false  
     def press_reset(self,*args):
 
         print('Reset button pressed')
         msg=BoolStamped()
         msg.header.stamp = rospy.Time.now() 
         msg.data = True
+        pub3.publish(msg)
+        rospy.sleep(0.25)
+        msg.header.stamp = rospy.Time.now() 
+        msg.data = False
         pub3.publish(msg)
         #self.root.ids['led_animated'].set_off()
         #self.root.ids['led_typeboth1'].toggle_state()
