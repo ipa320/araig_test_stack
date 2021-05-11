@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>         
+
+    <node pkg="araig_test_gui" type="simple_gui" name="simple_gui" output="screen" >
+        <remap from="/button1" to="/signal/ui/start_test"/>
+        <remap from="/button2" to="/signal/ui/interrupt_test"/>
+        <remap from="/button3" to="/signal/ui/reset_test"/>
+        <remap from="/float_2" to="/data/calc/braking_time"/>
+        <remap from="/float_2" to="/data/calc/braking_distance"/>
+    </node>
+
+</launch>

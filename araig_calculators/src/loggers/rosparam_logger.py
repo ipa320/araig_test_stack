@@ -47,8 +47,10 @@ class RosparamLoggerClass(BaseLogger):
                     rospy.sleep(self.config_param[self.node_name + "/stop_offset"])
                     self.killCommandProc()
 
-        # Wait for stop signal
-        while stop is False and start is True and not rospy.is_shutdown():
-            self._rate.sleep()
-            stop = self.getSafeFlag("stop")
-            start = self.getSafeFlag("start")
+        rospy.loginfo(rospy.get_name() + ": Waiting for trigger signals to reset")
+        # Wait for stop and start to go low
+        while (stop or start) and not rospy.is_shutdown():
+                self._rate.sleep()
+                stop = self.getSafeFlag("stop")
+                start = self.getSafeFlag("start")
+        rospy.loginfo(rospy.get_name() + ": Resetting.")
