@@ -53,6 +53,17 @@ FloatLayout:
         color_off: [0,0,0,1]
         color_on: [0,1,0,1]
 
+    Led:
+        id: led_typeboth3
+        led_type: 'both'
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .9, "center_y": 0.5}
+        source_on: 'media/yes.png'
+        source_off: 'shapes/basic_disc.png'
+        color_off: [0,0,0,1]
+        color_on: [0,1,0,1]
+
+
     MDLabel: 
         id: click_label
         text: "Pick Testing Setup:"
@@ -70,28 +81,28 @@ FloatLayout:
         
     MDLabel: 
         id: result1_label
-        text: "Choose your Testsetup!"
+        text: "value"
         halign: "center"
         size_hint: 1, 1
-        pos_hint: {"center_x": .6, "center_y": 0.5}
+        pos_hint: {"center_x": .6, "center_y": 0.3}
 
     MDLabel: 
         id: result2_label
-        text: " "
+        text: "value"
         halign: "center"
         size_hint: 1, 1
-        pos_hint: {"center_x": .6, "center_y": 0.4}
+        pos_hint: {"center_x": .6, "center_y": 0.2}
 
     MDLabel: 
         id: result1_v_label
         text: " "
         halign: "center"
         size_hint: 1, 1
-        pos_hint: {"center_x": .8, "center_y": 0.5}    
+        pos_hint: {"center_x": .8, "center_y": 0.3}    
 
     MDLabel:
         id: result2_v_label
         text: " "
         halign: "center"
         size_hint: 1, 1
-        pos_hint: {"center_x": .8, "center_y": 0.4}
+        pos_hint: {"center_x": .8, "center_y": 0.2}
