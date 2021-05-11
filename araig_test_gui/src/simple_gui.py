@@ -8,6 +8,7 @@ from kivy.lang import Builder
 from kivy.uix.widget import Widget
 import threading
 from kivy.properties import ListProperty, OptionProperty, BooleanProperty, NumericProperty, StringProperty
+from araig_msgs.msg import BoolStamped, Float64Stamped
 
 class Led(Image):
     """Led widget for kivy"""
@@ -93,18 +94,38 @@ class App(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.screen=Builder.load_file('ros_gui.kv')
-    
-        """ rospy.Subscriber('/signal/runner/test_completed', callback_test_completed)
+        self.mutex_lock_float_1 = threading.Lock()
+        self.mutex_lock_float_2 = threading.Lock()
+        rospy.Subscriber('/float_1', Float64Stamped,  self.callback_float_1)
+        rospy.Subscriber('/float_2', Float64Stamped, self.callback_float_2)
+        self.float_1 = 0
+        self.float_2 = 1
+        print('called constructor')
+
+        """rospy.Subscriber('/signal/runner/test_completed', self.callback_test_completed)
         self.mutex_lock = threading.lock()
         self.completed
 
-        rospy.Subscriber('/signal/runner/test_succeeded', callback_test_succeeded)
+        rospy.Subscriber('/signal/runner/test_succeeded', self.callback_test_succeeded)
         self.mutex_lock_2 = threading.lock()
-        self.succeeded  """
+        self.succeeded  """ 
+    def callback_float_1(self, msg):
+        print('asdf')
+        with self.mutex_lock_float_1():
+            print("Got data: {}".format(msg.data))
+            self.root.ids['result1_v_label'].text = msg.data
+
+    def callback_float_2(self, msg):
+        with self.mutex_lock_float_2():
+            self.root.ids['result2_v_label'].text = msg.data
 
     def callback_test_completed(self, msg):
         with self.mutex_lock():
             self.completed = msg.data
+
+    def callback_test_failed(self, msg):
+        with self.mutex_lock():
+            self.failed = msg.data
 
     def callback_test_succeeded(self, msg):
         with self.mutex_lock_2():
@@ -136,34 +157,100 @@ class App(MDApp):
                 self.root.ids[k].toggle_state()
     
     def press_start(self,*args):
-       
-        print(self.testsetup +" has been started")
-        print(self.testsetup[-1])
-        msg=True
-        pub.publish(msg)
+
+
+        msg=BoolStamped() #alte
+        msg.header.stamp = rospy.Time.now() 
+        msg.data = True
+        pub1.publish(msg) 
+        if self.testsetup == 'test1_breaking':
+            print(self.testsetup +" has been started")
+            #sub
+
+        elif self.testsetup == 'test1_emergency':
+            print(self.testsetup +" has been started")
+            #
+
+        elif self.testsetup == 'test4':
+            print(self.testsetup +" has been started")
+            #
+
+        elif self.testsetup == 'test5_with_nav':
+            print(self.testsetup +" has been started")
+
+        else:
+            print(self.testsetup +" has been started")
+
+        
+        
         self.root.ids['led_animated'].toggle_state()
-           
-        #self.root.ids['led_typeboth1'].toggle_state()
-        #self.root.ids['led_typeboth2'].toggle_state()
 
     def press_interrupt(self,*args):
-        print("Interrupt button pressed")
+        print('Interrupt button pressed')
         msg=True
-        pub.publish(msg)
+        pub2.publish(msg)
+        self.root.ids['led_animated'].set_off()
+        self.root.ids['led_typeboth1'].toggle_state()
+    
+    
+    def press_reset(self,*args):
+        print('Reset button pressed')
+        msg=True
+        pub3.publish(msg)
         self.root.ids['led_animated'].set_off()
         self.root.ids['led_typeboth1'].toggle_state()
 
+
     def spinner_clicked(self,value):
-        print('You chose '+value)
         self.testsetup=value
+        #"test1_breaking", "test1_emergency","test4", "test5_with_nav", "test5_without_nav"]
+        if value == 'test1_breaking' or value == 'test1_emergency':
+            print('You chose '+value)
+            self.root.ids['result1_label'].text='breaking time: '
+            self.root.ids['result2_label'].text='breaking distance: '
+            self.root.ids['result1_v_label'].text='0'
+            self.root.ids['result2_v_label'].text='0'
+        #elif value == 'test1_emergency':
+        #    print('You chose '+value)
+        #    self.root.ids['result1_label'].text='breaking time: '
+        #    self.root.ids['result2_label'].text='breaking distance: '
+        #    self.root.ids['result1_v_label'].text='0'
+        #    self.root.ids['result2_v_label'].text='0'
+        elif value == 'test4' or value == 'test5_with_nav':
+            self.root.ids['result1_label'].text='goal time: '
+            self.root.ids['result2_label'].text=' '
+            self.root.ids['result1_v_label'].text='0'
+            self.root.ids['result2_v_label'].text=' '
+        else:
+            self.root.ids['result1_label'].text='Robot stop gap: '
+            self.root.ids['result2_label'].text=' '
+            self.root.ids['result1_v_label'].text='0'
+            self.root.ids['result2_v_label'].text=' '
+
+
+        # subscribe to the value
+        #case 2
+        #self.root.ids['result1_label'].text='breaking time'
+        #self.root.ids['result2_label'].text='breaking distance'
+        #case 3
+
+        #case 4
+
+
 
        # self.root.ids['spinner_id']
        # self.root.ids['spinner_clicked']
 
 
 if __name__ == '__main__':
-
-    pub=rospy.Publisher('/button',Bool,queue_size=1)
+    print('Hallo Tejas')
+    pub1=rospy.Publisher('/button1',BoolStamped,queue_size=1)
+    pub2=rospy.Publisher('/button2',BoolStamped,queue_size=1)
+    pub3=rospy.Publisher('/button3',BoolStamped,queue_size=1)
     rospy.init_node('simple_gui',anonymous=True)
+    spin_thread = threading.Thread(target=lambda: rospy.spin())
+    spin_thread.start()
+    #my_app = App()
     App().run()
+
     

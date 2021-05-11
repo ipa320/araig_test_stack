@@ -19,6 +19,12 @@ FloatLayout:
         pos_hint: {"center_x": .3, "center_y": 0.7}
         on_press: app.press_interrupt(*args)
 
+    MDRaisedButton:
+        text:"Reset"
+        size_hint: 0.1, 0.1
+        pos_hint: {"center_x": .3, "center_y": 0.5}
+        on_press: app.press_reset(*args)
+
     Led:
         id: led_animated
         led_type: 'both'
@@ -52,12 +58,40 @@ FloatLayout:
         text: "Pick Testing Setup:"
         halign: "center"
         size_hint: 1, 1
-        pos_hint: {"center_x": .3, "center_y": 0.5}
+        pos_hint: {"center_x": .1, "center_y": 0.3}
         
     Spinner:
         id: spinner_id
         size_hint: 0.2, 0.1
-        pos_hint: {"center_x": .5, "center_y": 0.5}
+        pos_hint: {"center_x": .3, "center_y": 0.3}
         text: "Testsetup"
-        values: ["Testsetup 1", "Testsetup 2","Testsetup 3", "Testsetup 4", "Testsetup 5"]
+        values: ["test1_breaking", "test1_emergency","test4", "test5_with_nav", "test5_without_nav"]
         on_text: app.spinner_clicked(spinner_id.text)
+        
+    MDLabel: 
+        id: result1_label
+        text: "Choose your Testsetup!"
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .6, "center_y": 0.5}
+
+    MDLabel: 
+        id: result2_label
+        text: " "
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .6, "center_y": 0.4}
+
+    MDLabel: 
+        id: result1_v_label
+        text: " "
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .8, "center_y": 0.5}    
+
+    MDLabel:
+        id: result2_v_label
+        text: " "
+        halign: "center"
+        size_hint: 1, 1
+        pos_hint: {"center_x": .8, "center_y": 0.4}
