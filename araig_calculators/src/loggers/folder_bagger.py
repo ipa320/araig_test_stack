@@ -7,27 +7,8 @@ from base_classes.base_logger import BaseLogger
 from base_classes.base import create_logging_folder, get_sub_folder, get_root_folder, create_file
 import threading
 from datetime import datetime
+from std_msgs.msg import String
 import os
-
-def get_folder_name(root):
-    try: 
-        os.listdir(root)
-    except OSError as err:
-        if err.errno == 2:
-            os.makedirs(root) 
-    
-    size = len(os.listdir(root))
-    size += 1
-    folder_name = root + str(size)
-    return folder_name
-
-def create_folder(folder_name):
-    try:
-        os.mkdir(folder_name)
-        rospy.loginfo(rospy.get_name() + ": Successfully created the directory " + folder_name)
-    except OSError as err:
-        rospy.logerr(rospy.get_name() + ": Failed to create " + folder_name + ", error msg: "+ str(err))
-
 class FolderBagger(BaseLogger):
     def __init__(self):
 
@@ -52,11 +33,24 @@ class FolderBagger(BaseLogger):
         # Optional whitelist topics that are test specific
         self.whitelist = self.whitelist + self.config_param[self.node_name + "/whitelist"]
 
+        self.begin_write_pub = rospy.Publisher('/out_begin_write', BoolStamped, queue_size=10, latch=True)
+
         try:
             while not rospy.is_shutdown():
                 self.main_loop() 
         except rospy.ROSException:
             pass 
+
+    def buildNewBoolStamped(self, data = True):
+        msg = BoolStamped()
+        msg.header.stamp = rospy.Time.now()
+        msg.data = data
+        return msg
+
+    def rosbag_begin_cb(self, msg):
+        if not self._published_once:
+            self.begin_write_pub.publish(self.buildNewBoolStamped(True))
+            self._published_once = True
 
     def prepare_topics(self):
         list_of_topics = rospy.get_published_topics()
@@ -79,6 +73,13 @@ class FolderBagger(BaseLogger):
         return topics_string
 
     def main_loop(self):
+        # Setup a subscriber to listen to when recording begins
+        # Subscriber publishes a signal when recording actually begins
+        # Set initial signal to false
+        self._published_once = False
+        self.begin_write_pub.publish(self.buildNewBoolStamped(False))
+        rospy.Subscriber("begin_write", String, self.rosbag_begin_cb)
+
         rospy.loginfo(rospy.get_name() + ": Waiting for start signal...")
         # Wait for start signal
         start = False
@@ -94,7 +95,8 @@ class FolderBagger(BaseLogger):
             dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
 
             root_folder = get_root_folder()
-            
+
+            # Wait for folder to be created before starting recording
             rospy.loginfo(rospy.get_name() + ": Start received. Sleep {}s to prepare..."
                 .format(self.config_param[self.node_name + "/start_offset"]))
             
@@ -105,7 +107,7 @@ class FolderBagger(BaseLogger):
             current_folder = get_sub_folder()
 
             topics_string = self.prepare_topics()
-            command = "rosbag record -o " + current_folder + "/" + self.config_param["/test_type"] + " " + topics_string
+            command = "rosbag record -p -o " + current_folder + "/" + self.config_param["/test_type"] + " " + topics_string
 
             self.startCommandProc(command)
 

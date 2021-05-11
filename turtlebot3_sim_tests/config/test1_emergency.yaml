@@ -1,5 +1,4 @@
 runner:
-    start_logging_offset: 10
     acceleration_timeout: 2
     decceleration_timeout: 4
     emergency_wait_timeout: 3.5
@@ -39,7 +38,7 @@ calculators:
       - /data/calc/braking_distance
 
   folder_bagger_node:
-    start_offset: 2 # Wait these many seconds before killing
+    start_offset: 0.5 # Wait these many seconds for folder to be created before start recording
     stop_offset: 2 # Wait these many seconds before killing
     whitelist:
     # Default whitelist: ["/signal/", "/data", "usb_cam", "/tf"]
@@ -51,7 +50,7 @@ calculators:
       - compressed
 
   robot_speed_logger:
-    start_offset: 1.5 # Must be longer than folder bagger, since this tends to be created first.
+    start_offset: 0.5 # Must be longer than folder bagger, since this tends to be created first.
     stop_offset: 0.1
     logged_data_title: "robot_speed" # Used to name the file
     column_headers: ["Time", "Speed"]

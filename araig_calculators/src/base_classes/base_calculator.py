@@ -63,14 +63,14 @@ class BaseCalculator(object):
 
         self.callback_module = callback_module
 
-        self.pub_init()
-        self.sub_init()
         
         # init FLAG and LOCK
         for topic in self.SubDict.keys():
             BaseCalculator.MSG[topic] = None
             BaseCalculator.LOCK[topic] = threading.Lock()
                 
+        self.pub_init()
+        self.sub_init()
         self.main()
 
     def pub_init(self):

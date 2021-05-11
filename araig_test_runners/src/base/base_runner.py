@@ -14,7 +14,8 @@ class TestBase(object):
             "robot_has_stopped"    : "/signal/calc/robot_has_stopped",
             "start_test"           : "/signal/ui/start_test",
             "interrupt_test"       : "/signal/ui/interrupt_test",
-            "reset_test"           : "/signal/ui/reset_test"
+            "reset_test"           : "/signal/ui/reset_test",
+            "began_recording"      : "/signal/logger/begin_write"
         }
         self._input_interface.update(sub_dict)
         self._output_interface = {
@@ -30,7 +31,6 @@ class TestBase(object):
         }
         self._output_interface.update(pub_dict)
         self._config_param = [
-            "start_logging_offset",
             ]
         self._config_param += param_list
 
@@ -136,13 +136,16 @@ class TestBase(object):
         # Wait until start signal received
         rospy.logwarn(rospy.get_name() + ": Waiting to start...")
         self.loopFallbackOnFlags(["start_test"])
-        # Start received, wait for recorders to boot up. Cannot be interrupted.
-        rospy.logwarn(rospy.get_name() + ": Start received, waiting {}s for recorder init"
-                        .format(self.config_param['start_logging_offset']))
-        self.sleepUninterruptedFor(self.config_param['start_logging_offset'])
+
+        # Start received, wait for recorder to boot up. Potentially infinite loop, can be interrupted.
+        rospy.logwarn(rospy.get_name() + ": Start received, waiting for recorder init")
+        if self.loopFallbackOnFlags(["began_recording"]) == self._RETURN_CASE_INTERRUPTED:
+            return False
+
         # Start robot
-        rospy.logwarn(rospy.get_name() + ": Starting robot")
+        rospy.logwarn(rospy.get_name() + ": Recorder is active, Starting robot")
         self.startRobot()
+        return True
 
     def testCompleted(self):
         self.stopRobot()
