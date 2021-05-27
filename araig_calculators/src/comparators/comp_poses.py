@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from multipledispatch import dispatch as Override
 import rospy
 import math
 from scipy.spatial.transform import Rotation
@@ -43,7 +42,6 @@ class compPoses(BaseCalculator):
         euler = rot.as_euler('xyz', degrees = True)
         return euler[2]
 
-    @Override()
     def calculate(self):
         temp = {}
         pub_msg = self.PubDict[self._pub_topic]()

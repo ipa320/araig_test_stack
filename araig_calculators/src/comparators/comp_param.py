@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from multipledispatch import dispatch as Override
 import rospy
 import threading
 from std_msgs.msg import Float64
@@ -36,7 +35,6 @@ class compParam(BaseCalculator):
             pub_dict = pub_dict,
             rate = rate)
 
-    @Override()
     def calculate(self):
         with BaseCalculator.LOCK[self._sub_topic]:
             current_vel = BaseCalculator.MSG[self._sub_topic]

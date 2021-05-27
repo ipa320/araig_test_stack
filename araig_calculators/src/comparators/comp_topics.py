@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from multipledispatch import dispatch as Override
 import rospy
 
 from base_classes.base_calculator import BaseCalculator
@@ -30,7 +29,6 @@ class compTopics(BaseCalculator):
                 pub_dict = pub_dict,
                 rate = rate)
 
-    @Override()
     def calculate(self):
         temp = {}
         msg = self.PubDict[self._pub_topic]()
