@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from multipledispatch import dispatch as Override
 import rospy
 
 from araig_msgs.msg import BoolStamped, Float64Stamped
@@ -30,7 +29,6 @@ class diffTime(BaseCalculator):
                 pub_dict = pub_dict,
                 rate = rate)
 
-    @Override()
     def calculate(self):
         temp = {}
 
