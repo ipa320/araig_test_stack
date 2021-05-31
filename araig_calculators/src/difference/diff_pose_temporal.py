@@ -85,7 +85,7 @@ class diffPoseTemporal(BaseCalculator):
         if temp[self._sub_topic_stop] is not None and \
                 temp[self._sub_topic_start] is not None and \
                 temp[self._sub_topic_start].data:
-            if self._prestate_stop is True and \
+            if self._prestate_stop is False and \
                     temp[self._sub_topic_stop].data is True:
                 self._posestamp_stop = temp[self._sub_topic_pose]
                 rospy.loginfo(rospy.get_name() + ": Stopped")

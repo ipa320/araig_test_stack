@@ -99,7 +99,7 @@ class FolderBagger(BaseLogger):
             start = self.getSafeFlag("start")
 
         # Create folder -> sleep -> start recording
-        if start and stop is False:
+        if start is True and stop is False:
             now = datetime.now()
             dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
 
