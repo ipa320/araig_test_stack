@@ -8,7 +8,9 @@ from .base import get_sub_folder, check_folder
 
 """supprot subscribe mix 3 topics
     if need more, only need to add as
-    function callback_1""" 
+    function callback_1"""
+
+
 class CallbackList():
     def callback_0(self, msg, args):
         BaseCalculator.MSG[args] = None
@@ -19,32 +21,39 @@ class CallbackList():
         BaseCalculator.MSG[args] = None
         with BaseCalculator.LOCK[args]:
             BaseCalculator.MSG[args] = msg
-    
+
     def callback_2(self, msg, args):
         BaseCalculator.MSG[args] = None
-        with BaseCalculator.LOCK[args]:        
+        with BaseCalculator.LOCK[args]:
             BaseCalculator.MSG[args] = msg
+
 
 """ pub_dict = {"event topic": "data_type", ...}
     sub_dict = {"topic_1": "data_type", "topic_2": "data_type" ...}
-    rosparam""" 
+    rosparam"""
+
+
 class BaseCalculator(object):
     MSG = {}
     LOCK = {}
 
     def __init__(self,
-        pub_dict = None,
-        sub_dict = None,
-        callback_module = CallbackList(), # class CallbackList
-        rate = None):
+                 pub_dict=None,
+                 sub_dict=None,
+                 callback_module=CallbackList(),  # class CallbackList
+                 rate=None):
 
-        if pub_dict == None:
-            rospy.logerr("{}:  Please provide output(pub) topic and data type".format(rospy.get_name()))
-                
-        if sub_dict == None:
-            rospy.logerr("{}:  Please provide input(sub) topic and data type".format(rospy.get_name()))
+        if pub_dict is None:
+            rospy.logerr(
+                "{}:  Please provide output(pub) topic and data type".format(
+                    rospy.get_name()))
 
-        if rate == None:
+        if sub_dict is None:
+            rospy.logerr(
+                "{}:  Please provide input(sub) topic and data type".format(
+                    rospy.get_name()))
+
+        if rate is None:
             rospy.logerr("{}:  Please provide rate".format(rospy.get_name()))
         self._rate = rospy.Rate(rate)
 
@@ -54,21 +63,19 @@ class BaseCalculator(object):
         self.log_msg = {}
 
         self.log_filename = ""
-        if rospy.has_param(ns + IF_LOG) and rospy.get_param(ns + IF_LOG) == True:
+        if rospy.has_param(ns + IF_LOG) and rospy.get_param(ns + IF_LOG):
             self.log_filename = "debug_" + rospy.get_name().replace('/', '') + ".yaml"
-            
 
         self.SubDict = sub_dict
         self.PubDict = pub_dict
 
         self.callback_module = callback_module
 
-        
         # init FLAG and LOCK
         for topic in self.SubDict.keys():
             BaseCalculator.MSG[topic] = None
             BaseCalculator.LOCK[topic] = threading.Lock()
-                
+
         self.pub_init()
         self.sub_init()
         self.main()
@@ -80,12 +87,12 @@ class BaseCalculator(object):
             data_type_module = self.PubDict[topic]
 
             self.PubDiag[topic] = rospy.Publisher(
-                topic, 
-                data_type_module, 
-                latch = True, 
+                topic,
+                data_type_module,
+                latch=True,
                 queue_size=10
-                )
-    
+            )
+
     def sub_init(self):
         self.sub_diag = {}
         self.sub_dict = {}
@@ -93,29 +100,38 @@ class BaseCalculator(object):
         for counter, topic in enumerate(self.SubDict.keys()):
             data_type_module = self.SubDict[topic]
             # call_back_name = topic.replace('/','_')
-            callback = getattr(self.callback_module, 'callback_'+ str(counter))
-            self.sub_diag[topic] = rospy.Subscriber(topic, data_type_module, callback, (topic))
-    
+            callback = getattr(
+                self.callback_module,
+                'callback_' + str(counter))
+            self.sub_diag[topic] = rospy.Subscriber(
+                topic, data_type_module, callback, (topic))
+
     #  should be inherit
     def calculate(self):
         pass
-    
-    def pub_only_state_change(self, pre_state, current_state, pub_topic, pub_msg, log = None):
+
+    def pub_only_state_change(
+            self,
+            pre_state,
+            current_state,
+            pub_topic,
+            pub_msg,
+            log=None):
         # first time get msg
-        if pre_state == None:
+        if pre_state is None:
             self.PubDiag[pub_topic].publish(pub_msg)
             pre_state = current_state
-            if log != None:
+            if log is not None:
                 rospy.loginfo(log)
             return True
         elif pre_state != current_state:
             self.PubDiag[pub_topic].publish(pub_msg)
             pre_state = current_state
-            if log != None:
+            if log is not None:
                 rospy.loginfo(log)
             return True
         return True
-    
+
     def get_logfile_path(self):
         folder = get_sub_folder()
         if check_folder(folder):
@@ -125,7 +141,10 @@ class BaseCalculator(object):
             return None
 
     def login_file(self, log_msg):
-        rospy.loginfo("{}: Writing result into {}".format(rospy.get_name(), self.get_logfile_path()))
+        rospy.loginfo(
+            "{}: Writing result into {}".format(
+                rospy.get_name(),
+                self.get_logfile_path()))
         if self.get_logfile_path is not None:
             try:
                 open(self.get_logfile_path(), 'a+')
@@ -140,8 +159,8 @@ class BaseCalculator(object):
 
     def main(self):
         try:
-            while not rospy.is_shutdown():        
-                self.calculate() 
+            while not rospy.is_shutdown():
+                self.calculate()
                 self._rate.sleep()
         except rospy.ROSException:
-            pass    
+            pass

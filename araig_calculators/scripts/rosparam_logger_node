@@ -5,5 +5,5 @@ from loggers.rosparam_logger import RosparamLoggerClass
 import rospy
 
 if __name__ == "__main__":
-    rospy.init_node("rosparam_logger_node")    
+    rospy.init_node("rosparam_logger_node")
     rosparam_logger = RosparamLoggerClass()
