@@ -7,6 +7,7 @@ import rospy
 from  araig_msgs.msg import BoolStamped, Float64Stamped
 from geometry_msgs.msg import PoseStamped
 
+
 class Test4WithAction(unittest.TestCase):
 
     def setUp(self):
@@ -32,7 +33,7 @@ class Test4WithAction(unittest.TestCase):
 
     def test_expected(self):
         while self.counter < 2:
-            self.counter +=1
+            self.counter += 1
             pub_msg = BoolStamped()
             pub_msg.data = True
             pub_msg.header.stamp = rospy.Time.now()
@@ -43,21 +44,21 @@ class Test4WithAction(unittest.TestCase):
             # wait for result
             while self.result_start is None:
                 rospy.sleep(0.01)
-            self.assertTrue(self.result_start, msg = 'Test {}: did not start'.format(self.counter))
+            self.assertTrue(self.result_start, msg='Test {}: did not start'.format(self.counter))
 
             while self.result_time is None or self.result_completed is None:
                 rospy.sleep(0.01)
             self.assertAlmostEqual(self.result_time, \
             self.result_time, \
             msg='Test {}: reached goal time: {}, expect {}'.format(self.counter, self.result_time, self.result_time), \
-            delta= 0.01)
+            delta=0.01)
 
             self.assertNotAlmostEqual(self.result_time, \
             0, \
-            msg = 'Test{}: reached goal time: {}, expect not ZERO'.format(self.counter, self.result_time), \
-            delta= 0.0)
+            msg='Test{}: reached goal time: {}, expect not ZERO'.format(self.counter, self.result_time), \
+            delta=0.0)
 
-            self.assertTrue(self.result_completed, msg = 'Test {}: did not complete'.format(self.counter))
+            self.assertTrue(self.result_completed, msg='Test {}: did not complete'.format(self.counter))
 
             rospy.sleep(1)
 
@@ -76,12 +77,12 @@ class Test4WithAction(unittest.TestCase):
             self.pub_reset.publish(pub_msg)
             rospy.sleep(1)
 
-            self.assertFalse(self.result_completed, msg = 'Test {}: is not reset'.format(self.counter+1))
+            self.assertFalse(self.result_completed, msg='Test {}: is not reset'.format(self.counter + 1))
 
             self.result_time = None
             self.result_completed = None
             self.result_start = None
-            
+
     def callback_1(self, msg):
         self.result_completed = msg.data
 

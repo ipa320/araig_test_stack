@@ -5,29 +5,30 @@ import yaml
 import os
 import threading
 
+
 class TestBase(object):
-    def __init__(self, sub_dict = {} , pub_dict = {}, param_list = {}, rate = 100):      
+    def __init__(self, sub_dict={}, pub_dict={}, param_list={}, rate=100):
 
         self._rate = rospy.Rate(rate)
 
         self._input_interface = {
-            "robot_has_stopped"    : "/signal/calc/robot_has_stopped",
-            "start_test"           : "/signal/ui/start_test",
-            "interrupt_test"       : "/signal/ui/interrupt_test",
-            "reset_test"           : "/signal/ui/reset_test",
-            "began_recording"      : "/signal/logger/begin_write"
+            "robot_has_stopped": "/signal/calc/robot_has_stopped",
+            "start_test": "/signal/ui/start_test",
+            "interrupt_test": "/signal/ui/interrupt_test",
+            "reset_test": "/signal/ui/reset_test",
+            "began_recording": "/signal/logger/begin_write"
         }
         self._input_interface.update(sub_dict)
         self._output_interface = {
-            "start_robot"           : "/signal/runner/start_robot",
-            "stop_robot"            : "/signal/runner/stop_robot",
-            "test_completed"        : "/signal/runner/test_completed",
-            "test_failed"           : "/signal/runner/test_failed",
-            "test_succeeded"        : "/signal/runner/test_succeeded",
+            "start_robot": "/signal/runner/start_robot",
+            "stop_robot": "/signal/runner/stop_robot",
+            "test_completed": "/signal/runner/test_completed",
+            "test_failed": "/signal/runner/test_failed",
+            "test_succeeded": "/signal/runner/test_succeeded",
             # TODO: The next 3 signals should be removed once UI is fully integrated
-            "start_test"            : "/signal/ui/start_test",
-            "reset_test"            : "/signal/ui/reset_test",
-            "interrupt_test"        : "/signal/ui/interrupt_test"
+            "start_test": "/signal/ui/start_test",
+            "reset_test": "/signal/ui/reset_test",
+            "interrupt_test": "/signal/ui/interrupt_test"
         }
         self._output_interface.update(pub_dict)
         self._config_param = [
@@ -54,12 +55,12 @@ class TestBase(object):
             self._flag[key].data = False
         # pub_init
         for key in self._output_interface:
-            self._publishers[key] = rospy.Publisher(self._output_interface[key], BoolStamped,queue_size=10, latch=True)
+            self._publishers[key] = rospy.Publisher(self._output_interface[key], BoolStamped, queue_size=10, latch=True)
             self._publishers[key].publish(self.buildNewBoolStamped(False))
 
         try:
             while not rospy.is_shutdown():
-                self.main() 
+                self.main()
                 self._rate.sleep()
         except rospy.ROSException:
             pass
@@ -70,9 +71,9 @@ class TestBase(object):
             return
         with self._locks[key]:
             self._flag[key] = value
-    
+
     # If seq = False, get data; If True, get header
-    def getSafeFlag(self, key, header = False):
+    def getSafeFlag(self, key, header=False):
         if not key in self._input_interface.keys():
             rospy.logerr(rospy.get_name() + ": Retrieving a key that does not exist!: {}".format(key))
             return
@@ -82,18 +83,18 @@ class TestBase(object):
                     return self._flag[key].data
                 else:
                     return self._flag[key].header
-    
-    def buildNewBoolStamped(self, data = True):
+
+    def buildNewBoolStamped(self, data=True):
         msg = BoolStamped()
         msg.header.stamp = rospy.Time.now()
         msg.data = data
         return msg
 
     def callback_for_all_bool_topics(self, msg, key):
-        self.setSafeFlag(key,msg)
+        self.setSafeFlag(key, msg)
 
     def timestampToFloat(self, stamp):
-        timestamp_float =  float(stamp.secs + float(stamp.nsecs*(1e-9)))
+        timestamp_float = float(stamp.secs + float(stamp.nsecs * (1e-9)))
         return timestamp_float
 
     def get_config(self, param_list):
@@ -167,8 +168,8 @@ class TestBase(object):
         rospy.logwarn(rospy.get_name() + ": Waiting for user to give reset signal")
         rospy.logwarn("----------------------------------------------------------")
 
-        # TODO: ui should set reset_test to False after set to True, reset signal is an event 
-        while not self.getSafeFlag("reset_test"): 
+        # TODO: ui should set reset_test to False after set to True, reset signal is an event
+        while not self.getSafeFlag("reset_test"):
             self._rate.sleep()
         rospy.logwarn(rospy.get_name() + ": Resetting")
         for key in self._output_interface:
@@ -182,7 +183,7 @@ class TestBase(object):
                 return self._RETURN_CASE_INTERRUPTED
 
     # Returns the first flag that is true, or if interrupted
-    def loopFallbackOnFlags(self, flag_list = []):
+    def loopFallbackOnFlags(self, flag_list=[]):
         while not self.isInterrupted():
             self._rate.sleep()
             for index, flag in enumerate(flag_list):
@@ -191,7 +192,7 @@ class TestBase(object):
         return self._RETURN_CASE_INTERRUPTED
 
     # Returns the first flag that is false, or if interrupted
-    def loopSequenceOnFlags(self, flag_list = []):
+    def loopSequenceOnFlags(self, flag_list=[]):
         while not self.isInterrupted():
             self._rate.sleep()
             for index, flag in enumerate(flag_list):

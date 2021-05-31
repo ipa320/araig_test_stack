@@ -7,6 +7,7 @@ from base_classes.base import get_sub_folder, check_folder
 import os
 import threading
 
+
 class TimeSeriesLoggerClass(BaseLogger):
     def __init__(self):
 
@@ -18,7 +19,7 @@ class TimeSeriesLoggerClass(BaseLogger):
             self.node_name + "/stop_offset",
             self.node_name + "/logged_data_title",
             self.node_name + "/column_headers"
-            ]
+        ]
 
         self.config_param = {}
         self.getConfig(param_list)
@@ -31,16 +32,17 @@ class TimeSeriesLoggerClass(BaseLogger):
         }
 
         super(TimeSeriesLoggerClass, self).__init__(
-            param_list = param_list, \
-            sub_dict = extend_subscribers_dict)
+            param_list=param_list,
+            sub_dict=extend_subscribers_dict)
 
         try:
             while not rospy.is_shutdown():
-                self.main_loop() 
+                self.main_loop()
         except rospy.ROSException:
-            pass 
+            pass
 
-    # Must be overridden to populate self.data_row based on subscribed type, and self.data_available.
+    # Must be overridden to populate self.data_row based on subscribed type,
+    # and self.data_available.
     def data_subscriber(self, msg):
         pass
 
@@ -56,17 +58,19 @@ class TimeSeriesLoggerClass(BaseLogger):
 
         # Wait for folder to be created before starting
         rospy.loginfo(rospy.get_name() + ": Start recevied. Sleep {}s to prepare"
-                        .format(self.config_param[self.node_name + "/start_offset"]))
+                      .format(self.config_param[self.node_name + "/start_offset"]))
         rospy.sleep(self.config_param[self.node_name + "/start_offset"])
         folder = get_sub_folder()
         if check_folder(folder):
-            filename = folder + "/" + self.config_param[self.node_name + "/logged_data_title"] + ".csv"
+            filename = folder + "/" + \
+                self.config_param[self.node_name + "/logged_data_title"] + ".csv"
             rospy.loginfo(rospy.get_name() + ": Starting logging into {} "
-                            .format(filename))
+                          .format(filename))
 
             with open(filename, mode='a') as target:
                 writer = csv.writer(target)
-                writer.writerow(self.config_param[self.node_name + "/column_headers"])
+                writer.writerow(
+                    self.config_param[self.node_name + "/column_headers"])
                 while not stop and not rospy.is_shutdown():
                     self._rate.sleep()
                     with self.lock_data:
@@ -76,11 +80,13 @@ class TimeSeriesLoggerClass(BaseLogger):
                             self.data_list = []
                     stop = self.getSafeFlag("stop")
 
-            rospy.loginfo(rospy.get_name() + ": Stop recevied. Waiting for trigger signals to reset.")
+            rospy.loginfo(
+                rospy.get_name() +
+                ": Stop recevied. Waiting for trigger signals to reset.")
 
         # Wait for stop and start to go low
         while (stop or start) and not rospy.is_shutdown():
-                self._rate.sleep()
-                stop = self.getSafeFlag("stop")
-                start = self.getSafeFlag("start")
+            self._rate.sleep()
+            stop = self.getSafeFlag("stop")
+            start = self.getSafeFlag("start")
         rospy.loginfo(rospy.get_name() + ": Resetting.")

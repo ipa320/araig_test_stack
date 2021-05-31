@@ -7,6 +7,7 @@ import rospy
 from  araig_msgs.msg import BoolStamped, Float64Stamped
 from geometry_msgs.msg import Twist
 
+
 class Test1Braking(unittest.TestCase):
 
     def setUp(self):
@@ -34,13 +35,13 @@ class Test1Braking(unittest.TestCase):
         self.result_distance = None
         self.result_time = None
         self.result_max = None
-        self.result_failed  = None
+        self.result_failed = None
 
         self.counter = 0
 
     def test_brake(self):
         while self.counter < 3:
-            self.counter +=1
+            self.counter += 1
             pub_msg = BoolStamped()
             pub_msg.data = True
             pub_msg.header.stamp = rospy.Time.now()
@@ -50,10 +51,10 @@ class Test1Braking(unittest.TestCase):
 
             # testing if robot did not really reach max speed
             if self.counter == 1:
-                while self.result_max is None or self.result_max.data == False:
+                while self.result_max is None or self.result_max.data is False:
                     rospy.sleep(0.01)
                 vel = Twist()
-                if self.result_max.data == True:
+                if self.result_max.data is True:
                     vel.linear.x = 0.7
                     for i in range(100):
                         rospy.sleep(0.01)
@@ -65,26 +66,26 @@ class Test1Braking(unittest.TestCase):
 
             self.assertAlmostEqual(self.result_time, \
             self.result_time, \
-            msg = 'Test{}: braking time: {}, expect {}'.format(self.counter, self.result_time, self.result_time), \
-            delta= 0.1)
+            msg='Test{}: braking time: {}, expect {}'.format(self.counter, self.result_time, self.result_time), \
+            delta=0.1)
 
             self.assertNotAlmostEqual(self.result_time, \
             0, \
-            msg = 'Test{}: braking time: {}, expect not ZERO'.format(self.counter, self.result_time), \
-            delta= 0.0)
+            msg='Test{}: braking time: {}, expect not ZERO'.format(self.counter, self.result_time), \
+            delta=0.0)
 
             while self.result_distance is None:
                 rospy.sleep(0.01)
 
             self.assertAlmostEqual(self.result_distance, \
             self.result_distance, \
-            msg = 'Test{}: braking distance: {}, expect {}'.format(self.counter, self.result_distance, self.result_distance), \
-            delta= 0.1)
+            msg='Test{}: braking distance: {}, expect {}'.format(self.counter, self.result_distance, self.result_distance), \
+            delta=0.1)
 
             self.assertNotAlmostEqual(self.result_distance, \
             0, \
-            msg = 'Test{}: braking distance: {}, expect not ZERO'.format(self.counter, self.result_distance), \
-            delta= 0.0)
+            msg='Test{}: braking distance: {}, expect not ZERO'.format(self.counter, self.result_distance), \
+            delta=0.0)
 
             # pub /signal/ui/reset_test
             rospy.sleep(10)
@@ -95,10 +96,10 @@ class Test1Braking(unittest.TestCase):
 
             self.result_distance = None
             self.result_time = None
-    
+
     def test_interrupted(self):
         while self.counter < 3:
-            self.counter +=1
+            self.counter += 1
             pub_msg = BoolStamped()
             pub_msg.data = True
 
@@ -112,13 +113,13 @@ class Test1Braking(unittest.TestCase):
                 pub_msg.data = True
                 pub_msg.header.stamp = rospy.Time.now()
                 self.pub_interrupt.publish(pub_msg)
-            
+
             if self.counter == 2:
                 rospy.sleep(0.1)
                 pub_msg.data = True
                 pub_msg.header.stamp = rospy.Time.now()
                 self.pub_interrupt.publish(pub_msg)
-            
+
             if self.counter == 3:
                 rospy.sleep(2.1)
                 pub_msg.data = True
@@ -129,8 +130,8 @@ class Test1Braking(unittest.TestCase):
             while self.result_failed is None or self.result_failed is False:
                 rospy.sleep(0.01)
 
-            self.assertTrue(self.result_failed, 
-            msg = 'Test{}: Test_Failed should be True, but get {}'.format(self.counter, self.result_failed))
+            self.assertTrue(self.result_failed,
+            msg='Test{}: Test_Failed should be True, but get {}'.format(self.counter, self.result_failed))
 
             # pub /signal/ui/reset_test
             rospy.sleep(10)
@@ -143,12 +144,12 @@ class Test1Braking(unittest.TestCase):
 
     def callback_1(self, msg):
         self.result_distance = msg.data
-   
+
     def callback_2(self, msg):
         self.result_time = msg.data
 
     def callback_3(self, msg):
-        self.result_max = msg  
+        self.result_max = msg
 
     def callback_4(self, msg):
         self.result_failed = msg.data

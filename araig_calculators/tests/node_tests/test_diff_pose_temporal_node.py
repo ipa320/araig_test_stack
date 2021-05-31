@@ -6,7 +6,9 @@ import time
 import rostest
 import rospy
 from geometry_msgs.msg import PoseStamped
-from  araig_msgs.msg import BoolStamped, Float64Stamped
+from araig_msgs.msg import BoolStamped, Float64Stamped
+
+
 class TestCalcPoseDelta(unittest.TestCase):
 
     def setUp(self):
@@ -17,12 +19,23 @@ class TestCalcPoseDelta(unittest.TestCase):
         _sub_topic_2 = '/test/out_disp_position'
 
         rospy.init_node('test_calc_pose_delta', anonymous=True)
-        self.pub_start = rospy.Publisher(_pub_topic_1, BoolStamped, latch=True, queue_size=10)
-        self.pub_stop = rospy.Publisher(_pub_topic_2, BoolStamped, latch= True, queue_size=10)
-        self.pub_pose = rospy.Publisher(_pub_topic_3, PoseStamped, latch= True, queue_size=10)
+        self.pub_start = rospy.Publisher(
+            _pub_topic_1, BoolStamped, latch=True, queue_size=10)
+        self.pub_stop = rospy.Publisher(
+            _pub_topic_2, BoolStamped, latch=True, queue_size=10)
+        self.pub_pose = rospy.Publisher(
+            _pub_topic_3, PoseStamped, latch=True, queue_size=10)
 
-        rospy.Subscriber(_sub_topic_1, Float64Stamped, callback=self.callback_1, queue_size=10)
-        rospy.Subscriber(_sub_topic_2, Float64Stamped, callback=self.callback_2, queue_size=10)
+        rospy.Subscriber(
+            _sub_topic_1,
+            Float64Stamped,
+            callback=self.callback_1,
+            queue_size=10)
+        rospy.Subscriber(
+            _sub_topic_2,
+            Float64Stamped,
+            callback=self.callback_2,
+            queue_size=10)
 
         self.delta_angle = None
         self.delta_pose = None
@@ -60,14 +73,30 @@ class TestCalcPoseDelta(unittest.TestCase):
         pub_signal.header.stamp = rospy.Time.now()
         pub_signal.data = True
         self.pub_stop.publish(pub_signal)
-        
+
         while self.delta_pose is None and self.delta_angle is None:
             time.sleep(0.1)
 
-        self.assertEqual(self.delta_pose, 5.0, 'test 1:{} is not equal to 5.0'.format(self.delta_pose))
-        self.assertEqual(self.delta_angle, 90.0, 'test 1: {} is not equal to 5.0'.format(self.delta_angle))
-        self.assertEqual(self.msg_seq_pose, 1, 'test 1: msg_pose published {} times'.format(self.msg_seq_pose))
-        self.assertEqual(self.msg_seq_angle, 1, 'test 1: msg_angle published {} times'.format(self.msg_seq_angle))
+        self.assertEqual(
+            self.delta_pose,
+            5.0,
+            'test 1:{} is not equal to 5.0'.format(
+                self.delta_pose))
+        self.assertEqual(
+            self.delta_angle,
+            90.0,
+            'test 1: {} is not equal to 5.0'.format(
+                self.delta_angle))
+        self.assertEqual(
+            self.msg_seq_pose,
+            1,
+            'test 1: msg_pose published {} times'.format(
+                self.msg_seq_pose))
+        self.assertEqual(
+            self.msg_seq_angle,
+            1,
+            'test 1: msg_angle published {} times'.format(
+                self.msg_seq_angle))
 
         # reset signal , test agains
         pub_signal.data = False
@@ -86,11 +115,26 @@ class TestCalcPoseDelta(unittest.TestCase):
         self.pub_stop.publish(pub_signal)
         while self.delta_pose is None and self.delta_angle is None:
             time.sleep(0.1)
-        self.assertEqual(self.delta_pose, 5.0, 'test 2: {} is not equal to 5.0'.format(self.delta_pose))
-        self.assertEqual(self.delta_angle, 90.0, 'test 2: {} is not equal to 5.0'.format(self.delta_angle))
-        self.assertEqual(self.msg_seq_angle, 2, 'test 2: msg_angle published {} times'.format(self.msg_seq_angle))
-        self.assertEqual(self.msg_seq_pose, 2, 'test 2: msg_pose published {} times'.format(self.msg_seq_pose))
-
+        self.assertEqual(
+            self.delta_pose,
+            5.0,
+            'test 2: {} is not equal to 5.0'.format(
+                self.delta_pose))
+        self.assertEqual(
+            self.delta_angle,
+            90.0,
+            'test 2: {} is not equal to 5.0'.format(
+                self.delta_angle))
+        self.assertEqual(
+            self.msg_seq_angle,
+            2,
+            'test 2: msg_angle published {} times'.format(
+                self.msg_seq_angle))
+        self.assertEqual(
+            self.msg_seq_pose,
+            2,
+            'test 2: msg_pose published {} times'.format(
+                self.msg_seq_pose))
 
     def callback_1(self, msg):
         self.delta_angle = msg.data
