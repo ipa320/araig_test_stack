@@ -2,12 +2,12 @@
 import rospy
 from comparators.comp_topics import compTopics
 
-        
+
 if __name__ == "__main__":
     rospy.init_node("comparater")
-    
+
     module_name = "/calculators"
     ns = module_name + rospy.get_name()
 
-    comparater = compTopics(tolerance = rospy.get_param(ns + "/tolerance"),
-                            rate = 100)
+    comparater = compTopics(tolerance=rospy.get_param(ns + "/tolerance"),
+                            rate=100)

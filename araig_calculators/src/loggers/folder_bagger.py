@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-import subprocess, shlex
+import subprocess
+import shlex
 from araig_msgs.msg import BoolStamped
 from base_classes.base_logger import BaseLogger
 from base_classes.base import create_logging_folder, get_sub_folder, get_root_folder, create_file
@@ -9,14 +10,16 @@ import threading
 from datetime import datetime
 from std_msgs.msg import String
 import os
+
+
 class FolderBagger(BaseLogger):
     def __init__(self):
 
         self.node_name = rospy.get_name()
 
         extend_subscribers_dict = {
-            "test_failed"          : "/test_failed",
-            "test_succeeded"       : "/test_succeeded",
+            "test_failed": "/test_failed",
+            "test_succeeded": "/test_succeeded",
         }
 
         param_list = [
@@ -26,22 +29,29 @@ class FolderBagger(BaseLogger):
             self.node_name + "/whitelist",
             "/test_type"]
 
-        super(FolderBagger, self).__init__(sub_dict= extend_subscribers_dict, param_list = param_list)
+        super(
+            FolderBagger,
+            self).__init__(
+            sub_dict=extend_subscribers_dict,
+            param_list=param_list)
 
-        # Default whitelist topics that should always be recorded for every test
+        # Default whitelist topics that should always be recorded for every
+        # test
         self.whitelist = ["/signal/", "/data", "usb_cam", "/tf"]
         # Optional whitelist topics that are test specific
-        self.whitelist = self.whitelist + self.config_param[self.node_name + "/whitelist"]
+        self.whitelist = self.whitelist + \
+            self.config_param[self.node_name + "/whitelist"]
 
-        self.begin_write_pub = rospy.Publisher('/out_begin_write', BoolStamped, queue_size=10, latch=True)
+        self.begin_write_pub = rospy.Publisher(
+            '/out_begin_write', BoolStamped, queue_size=10, latch=True)
 
         try:
             while not rospy.is_shutdown():
-                self.main_loop() 
+                self.main_loop()
         except rospy.ROSException:
-            pass 
+            pass
 
-    def buildNewBoolStamped(self, data = True):
+    def buildNewBoolStamped(self, data=True):
         msg = BoolStamped()
         msg.header.stamp = rospy.Time.now()
         msg.data = data
@@ -53,11 +63,10 @@ class FolderBagger(BaseLogger):
             self._published_once = True
 
     def prepare_topics(self):
-        list_of_topics = rospy.get_published_topics()
-        list_of_topics.sort()
+        list_of_topics = sorted(rospy.get_published_topics())
         topics_string = ""
 
-        for topic,msg in list_of_topics:
+        for topic, msg in list_of_topics:
             topic_allowed = False
             for white_string in self.whitelist:
                 if white_string in topic:
@@ -68,7 +77,7 @@ class FolderBagger(BaseLogger):
                     topic_allowed = False
                     break
             if topic_allowed:
-                 topics_string = topics_string + topic + " "
+                topics_string = topics_string + topic + " "
 
         return topics_string
 
@@ -89,8 +98,8 @@ class FolderBagger(BaseLogger):
             self._rate.sleep()
             start = self.getSafeFlag("start")
 
-         # Create folder -> sleep -> start recording
-        if start == True and stop == False:
+        # Create folder -> sleep -> start recording
+        if start and stop is False:
             now = datetime.now()
             dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
 
@@ -98,16 +107,17 @@ class FolderBagger(BaseLogger):
 
             # Wait for folder to be created before starting recording
             rospy.loginfo(rospy.get_name() + ": Start received. Sleep {}s to prepare..."
-                .format(self.config_param[self.node_name + "/start_offset"]))
-            
+                          .format(self.config_param[self.node_name + "/start_offset"]))
+
             create_logging_folder(root_folder)
-            
+
             rospy.sleep(self.config_param[self.node_name + "/start_offset"])
 
             current_folder = get_sub_folder()
 
             topics_string = self.prepare_topics()
-            command = "rosbag record -p -o " + current_folder + "/" + self.config_param["/test_type"] + " " + topics_string
+            command = "rosbag record -p -o " + current_folder + "/" + \
+                self.config_param["/test_type"] + " " + topics_string
 
             self.startCommandProc(command)
 
@@ -115,26 +125,37 @@ class FolderBagger(BaseLogger):
         while not stop and not rospy.is_shutdown():
             self._rate.sleep()
             stop = self.getSafeFlag("stop")
-        
-        # Sleep -> Kill recorder (other loggers finish their tasks) -> rename folder
-        if start == True:
+
+        # Sleep -> Kill recorder (other loggers finish their tasks) -> rename
+        # folder
+        if start:
             if stop or rospy.is_shutdown():
                 rospy.loginfo(rospy.get_name() + ": Stop received. Sleep {}s to settle..."
-                    .format(self.config_param[self.node_name + "/stop_offset"]))
+                              .format(self.config_param[self.node_name + "/stop_offset"]))
                 rospy.sleep(self.config_param[self.node_name + "/stop_offset"])
                 self.killCommandProc()
-                rospy.sleep(0.5) # Sleep again to let process die properly
+                rospy.sleep(0.5)  # Sleep again to let process die properly
                 if self.getSafeFlag("test_failed"):
                     create_file(current_folder, "failed_" + dt_string)
-                    rospy.loginfo(rospy.get_name() + ": Test failed, create file " + "failed_" + dt_string)
+                    rospy.loginfo(
+                        rospy.get_name() +
+                        ": Test failed, create file " +
+                        "failed_" +
+                        dt_string)
                 elif self.getSafeFlag("test_succeeded"):
                     create_file(current_folder, "succeeded_" + dt_string)
-                    rospy.loginfo(rospy.get_name() + ": Test succeeded, create file " + "succeeded_" + dt_string)
+                    rospy.loginfo(
+                        rospy.get_name() +
+                        ": Test succeeded, create file " +
+                        "succeeded_" +
+                        dt_string)
 
-        rospy.loginfo(rospy.get_name() + ": Waiting for trigger signals to reset")
+        rospy.loginfo(
+            rospy.get_name() +
+            ": Waiting for trigger signals to reset")
         # Wait for stop and start to go low
         while (stop or start) and not rospy.is_shutdown():
-                self._rate.sleep()
-                stop = self.getSafeFlag("stop")
-                start = self.getSafeFlag("start")
+            self._rate.sleep()
+            stop = self.getSafeFlag("stop")
+            start = self.getSafeFlag("start")
         rospy.loginfo(rospy.get_name() + ": Resetting.")

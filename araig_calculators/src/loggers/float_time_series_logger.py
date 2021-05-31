@@ -5,6 +5,7 @@ import csv
 from base_classes.base_time_series_logger import TimeSeriesLoggerClass
 from std_msgs.msg import Float64
 
+
 class FloatSeriesLoggerClass(TimeSeriesLoggerClass):
     def __init__(self):
         super(FloatSeriesLoggerClass, self).__init__()
