@@ -55,5 +55,6 @@ if (CATKIN_ENABLE_TESTING)
   include_directories(include ${catkin_INCLUDE_DIRS})
 
   add_rostest(tests/test_velocity_interpreter.test)
+  # TODO: fix test
   # add_rostest(tests/test_goal_interpreter_action.test)
 endif()
