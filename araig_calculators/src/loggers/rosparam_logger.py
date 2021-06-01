@@ -3,11 +3,9 @@ import rospy
 from base_classes.base_logger import BaseLogger
 from base_classes.base import get_sub_folder, check_folder
 import os
-
-
 class RosparamLoggerClass(BaseLogger):
     def __init__(self):
-
+        
         self.node_name = rospy.get_name()
         self.namespace_list = ["calculators"]
 
@@ -15,15 +13,15 @@ class RosparamLoggerClass(BaseLogger):
             self.node_name + "/start_offset",
             self.node_name + "/stop_offset",
             self.node_name + "/namespaces",
-        ]
+            ]
 
-        super(RosparamLoggerClass, self).__init__(param_list=param_list)
+        super(RosparamLoggerClass, self).__init__(param_list = param_list)
 
         try:
             while not rospy.is_shutdown():
-                self.main_loop()
+                self.main_loop() 
         except rospy.ROSException:
-            pass
+            pass 
 
     def main_loop(self):
         rospy.loginfo(rospy.get_name() + ": Waiting for start signal...")
@@ -34,23 +32,19 @@ class RosparamLoggerClass(BaseLogger):
             self._rate.sleep()
             start = self.getSafeFlag("start")
 
-        if start and stop is False:
+        if start == True and stop == False:
             # Wait for folder to be created before starting
             rospy.loginfo(rospy.get_name() + ": Start received. Sleep {}s to prepare..."
-                          .format(self.config_param[self.node_name + "/start_offset"]))
+                .format(self.config_param[self.node_name + "/start_offset"]))
             rospy.sleep(self.config_param[self.node_name + "/start_offset"])
             folder = get_sub_folder()
-
+            
             for ns in self.config_param[self.node_name + "/namespaces"]:
                 if check_folder(folder):
-                    command = "rosparam dump " + folder + "/param_" + ns + ".yaml" + " /" + ns
+                    command = "rosparam dump " + folder +"/param_"+ ns + ".yaml" + " /" + ns
                     self.startCommandProc(command)
-                    rospy.loginfo(
-                        rospy.get_name() +
-                        ": Save rosparam under namespace: " +
-                        ns)
-                    rospy.sleep(
-                        self.config_param[self.node_name + "/stop_offset"])
+                    rospy.loginfo(rospy.get_name() + ": Save rosparam under namespace: " + ns)
+                    rospy.sleep(self.config_param[self.node_name + "/stop_offset"])
                     self.killCommandProc()
 
         # Wait for stop signal

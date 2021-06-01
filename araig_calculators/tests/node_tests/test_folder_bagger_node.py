@@ -4,9 +4,8 @@ import unittest
 import time
 import rostest
 import rospy
-from araig_msgs.msg import BoolStamped
+from  araig_msgs.msg import BoolStamped
 import os
-
 
 class TestFolderLogger(unittest.TestCase):
 
@@ -14,33 +13,28 @@ class TestFolderLogger(unittest.TestCase):
         _pub_topic_start = '/test/start'
         _pub_topic_stop = '/test/stop'
         _pub_topic_success = '/test/test_succeeded'
-        _pub_topic_fail = '/test/test_failed'
+        _pub_topic_fail = '/test/test_failed'      
 
         rospy.init_node('test_folder_logger', anonymous=True)
-        self.pub_start = rospy.Publisher(
-            _pub_topic_start, BoolStamped, latch=True, queue_size=10)
-        self.pub_stop = rospy.Publisher(
-            _pub_topic_stop, BoolStamped, latch=True, queue_size=10)
-        self.pub_success = rospy.Publisher(
-            _pub_topic_success, BoolStamped, latch=True, queue_size=10)
-        self.pub_fail = rospy.Publisher(
-            _pub_topic_fail, BoolStamped, latch=True, queue_size=10)
+        self.pub_start = rospy.Publisher(_pub_topic_start, BoolStamped, latch=True, queue_size=10)
+        self.pub_stop = rospy.Publisher(_pub_topic_stop, BoolStamped, latch=True, queue_size=10)
+        self.pub_success = rospy.Publisher(_pub_topic_success, BoolStamped, latch=True, queue_size=10)
+        self.pub_fail = rospy.Publisher(_pub_topic_fail, BoolStamped, latch=True, queue_size=10)
 
         module = "/calculators"
 
-        while (not rospy.has_param(module + "/robot_type") and
-               not rospy.has_param(module + "/test_type")):
+        while (not rospy.has_param(module + "/robot_type") and \
+            not rospy.has_param(module + "/test_type")):
             time.sleep(0.1)
-
-        if (not rospy.has_param(module + "/dest_dir") or
-                rospy.get_param(module + "/dest_dir") == ""):
+                
+        if (not rospy.has_param(module + "/dest_dir") or rospy.get_param(module + "/dest_dir") == "") :
             self.dest_dir = os.path.expanduser("~")
         else:
             self.dest_dir = rospy.get_param(module + "/dest_dir")
 
         self.robot_type = rospy.get_param(module + "/robot_type")
         self.test_type = rospy.get_param(module + "/test_type")
-
+        
         self.i = 0
 
     def test_expected(self):
@@ -74,7 +68,7 @@ class TestFolderLogger(unittest.TestCase):
             pub_msg.header.stamp = rospy.Time.now()
             pub_msg.data = False
             self.pub_stop.publish(pub_msg)
-
+            
             rospy.sleep(1)
             pub_msg.header.stamp = rospy.Time.now()
             pub_msg.data = True
@@ -84,7 +78,7 @@ class TestFolderLogger(unittest.TestCase):
             for i in os.listdir(self.path):
                 try:
                     os.rmdir(self.path + i)
-                except BaseException:
+                except:
                     files = os.listdir(self.path + i)
                     for f in files:
                         os.remove(os.path.join(self.path + i, f))

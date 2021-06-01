@@ -6,8 +6,6 @@ import rostest
 import rospy
 from  araig_msgs.msg import BoolStamped, Float64Stamped
 from cob_msgs.msg import EmergencyStopState
-
-
 class Test1Emergency(unittest.TestCase):
 
     def setUp(self):
@@ -30,11 +28,11 @@ class Test1Emergency(unittest.TestCase):
 
     def test_expected(self):
         while self.counter < 3:
-            self.counter += 1
+            self.counter +=1
             pub_msg_signal = BoolStamped()
             pub_msg_signal.data = True
             pub_msg_signal.header.stamp = rospy.Time.now()
-
+            
             # pub /signal/ui/start_test
             self.pub_start.publish(pub_msg_signal)
 
@@ -50,26 +48,26 @@ class Test1Emergency(unittest.TestCase):
 
             self.assertAlmostEqual(self.result_time, \
             self.result_time, \
-            msg='Test{}: braking time: {}, expect {}'.format(self.counter, self.result_time, self.result_time), \
-            delta=0.1)
+            msg = 'Test{}: braking time: {}, expect {}'.format(self.counter, self.result_time, self.result_time), \
+            delta= 0.1)
 
             self.assertNotAlmostEqual(self.result_time, \
             0, \
-            msg='Test{}: braking time: {}, expect not ZERO'.format(self.counter, self.result_time), \
-            delta=0.0)
+            msg = 'Test{}: braking time: {}, expect not ZERO'.format(self.counter, self.result_time), \
+            delta= 0.0)
 
             while self.result_distance is None:
                 rospy.sleep(0.01)
 
             self.assertAlmostEqual(self.result_distance, \
             self.result_distance, \
-            msg='Test{}: braking distance: {}, expect {}'.format(self.counter, self.result_distance, self.result_distance), \
-            delta=0.1)
+            msg = 'Test{}: braking distance: {}, expect {}'.format(self.counter, self.result_distance, self.result_distance), \
+            delta= 0.1)
 
             self.assertNotAlmostEqual(self.result_distance, \
             0, \
-            msg='Test{}: braking distance: {}, expect not ZERO'.format(self.counter, self.result_distance), \
-            delta=0.0)
+            msg = 'Test{}: braking distance: {}, expect not ZERO'.format(self.counter, self.result_distance), \
+            delta= 0.0)
 
             # pub /signal/ui/reset_test
             rospy.sleep(4)
@@ -84,10 +82,10 @@ class Test1Emergency(unittest.TestCase):
 
             self.result_distance = None
             self.result_time = None
-
+            
     def callback_2(self, msg):
         self.result_time = msg.data
-
+        
     def callback_1(self, msg):
         self.result_distance = msg.data
 

@@ -7,7 +7,6 @@ import rospy
 from  araig_msgs.msg import BoolStamped, Float64Stamped
 from geometry_msgs.msg import PoseStamped
 
-
 class Test4NoGoal(unittest.TestCase):
 
     def setUp(self):
@@ -31,7 +30,7 @@ class Test4NoGoal(unittest.TestCase):
 
     def test_expected(self):
         while self.counter < 5:
-            self.counter += 1
+            self.counter +=1
             pub_msg = BoolStamped()
             pub_msg.data = True
             pub_msg.header.stamp = rospy.Time.now()
@@ -51,14 +50,14 @@ class Test4NoGoal(unittest.TestCase):
             self.assertAlmostEqual(self.result_gap, \
             self.result_gap, \
             msg='Test {}: robot stop at {}m from the obstacle, expect {}m'.format(self.counter, self.result_gap, self.result_gap), \
-            delta=0.01)
+            delta= 0.01)
 
             self.assertNotAlmostEqual(self.result_gap, \
             0, \
-            msg='Test{}: robot should not stop at {}m from the obstacle'.format(self.counter, self.result_gap), \
-            delta=0.0)
+            msg = 'Test{}: robot should not stop at {}m from the obstacle'.format(self.counter, self.result_gap), \
+            delta= 0.0)
 
-            self.assertTrue(self.result_completed, msg='Test {}: did not complete'.format(self.counter))
+            self.assertTrue(self.result_completed, msg = 'Test {}: did not complete'.format(self.counter))
 
             rospy.sleep(5)
             # pub /signal/ui/reset_test
@@ -70,7 +69,7 @@ class Test4NoGoal(unittest.TestCase):
             self.result_time = None
             self.result_completed = None
             self.result_start = None
-
+            
     def callback_1(self, msg):
         self.result_completed = msg.data
 
