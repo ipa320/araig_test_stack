@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+import rospy
+from base.base_runner import TestBase
+import enum
+
+""""
+BASE INTERFACES
+# sub
+self._input_interface = {
+    "robot_has_stopped"    : "/signal/calc/robot_has_stopped",
+    "start_test"           : "/signal/ui/start_test",
+    "interrupt_test"       : "/signal/ui/interrupt_test",
+    "reset_test"           : "/signal/ui/reset_test",
+    "began_recording"      : "/signal/logger/begin_write"
+}
+# pub
+self._output_interface = {
+    "start_robot"          : "/signal/runner/start_robot",
+    "test_completed"       : "/signal/runner/test_completed",
+    "test_failed"          : "/signal/runner/test_failed",
+    "test_succeeded"       : "/signal/runner/test_succeeded",
+    "start_test"           : "/signal/ui/start_test",
+    "reset_test"           : "/signal/ui/reset_test",
+    "interrupt_test"       : "/signal/ui/interrupt_test",
+}
+"""
+
+
+class Test3(TestBase):
+    def __init__(self, rate):
+
+        extend_subscribers_dict = {
+            "user_check_succeed": "/signal/ui/check_succeed",
+            "user_check_failed": "/signal/ui/check_failed",
+        }
+        extend_publishers_dict = {
+            "user_check_succeed": "/signal/ui/check_succeed",
+            "user_check_failed": "/signal/ui/check_failed",
+        }
+        extend_param_list = {
+        }
+
+        super(Test3, self).__init__(sub_dict=extend_subscribers_dict,
+                                    pub_dict=extend_publishers_dict,
+                                    param_list=extend_param_list,
+                                    rate=rate)
+
+    def main(self):
+        # Standard startup, robot started on return True, or interrupted on
+        # return False
+        if not self.standardStartupSequence():
+            return
+
+        # Wait until finish test
+        result = self.loopFallbackOnFlags(
+            ["user_check_succeed", "user_check_failed"])
+        if result == self._RETURN_CASE_INTERRUPTED:
+            return
+        if result == 0:
+            rospy.logwarn(
+                rospy.get_name() +
+                ": Robot has finished test in success!!")
+            self.testSucceeded()
+        if result == 1:
+            rospy.logwarn(
+                rospy.get_name() +
+                ": Robot has finished test in failure!!")
+            self.testFailed()
+
+        # TODO: Emulating UI responsibility Remove this once UI is integrated.
+        self._publishers["start_test"].publish(self.buildNewBoolStamped(False))
+        self.waitForReset()
+
+
+if __name__ == "__main__":
+    try:
+        rospy.init_node("Test3_runner", disable_signals=True)
+        test = Test3(100)
+    except rospy.ROSException:
+        pass
