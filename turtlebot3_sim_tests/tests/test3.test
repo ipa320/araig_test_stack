@@ -1,0 +1,17 @@
+<launch>
+  <arg name="gui" default="false"/>
+  <!-- simulation -->
+  <arg name="rviz_gui" default="false"/>
+  <include file="$(find turtlebot3_sim_tests)/launch/includes/turtlebot_fake.launch">
+      <arg name="rviz_gui" value="$(arg rviz_gui)" />
+  </include>
+
+  <!-- delay 1s -->
+  <include file="$(find turtlebot3_sim_tests)/launch/includes/timed_roslaunch.launch">
+    <arg name="time" value="1" />
+    <arg name="pkg" value="turtlebot3_sim_tests" />
+    <arg name="file" value="test3.launch" />
+    <arg name="node_name" value="test3"/>
+  </include>
+  
+</launch>
