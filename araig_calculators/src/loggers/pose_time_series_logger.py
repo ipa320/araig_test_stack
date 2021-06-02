@@ -9,8 +9,8 @@ import math
 
 class PoseSeriesLoggerClass(TimeSeriesLoggerClass):
     def __init__(self):
-        super(PoseSeriesLoggerClass, self).__init__()
         rospy.Subscriber("/in_pose_stamped", PoseStamped, self.data_subscriber)
+        super(PoseSeriesLoggerClass, self).__init__()
 
     def data_subscriber(self, msg):
         with self.lock_data:
