@@ -7,13 +7,13 @@
 
     <include  file="$(find araig_calculators)/launch/test_folder_bagger.launch" />
 
-    <node pkg="araig_calculators" type="float_series_logger_node" name="speed_logger" output="screen" >
+    <node pkg="araig_calculators" type="float_series_logger_node" name="robot_speed_logger" output="screen" >
         <remap from="/start" to="/signal/runner/start_robot"/>
         <remap from="/stop" to="/signal/runner/test_completed"/>
-        <remap from ="/in_float" to="/data/robot/odom/twist/linear/x" />
+        <remap from ="/in_float" to="/data/robot/odom/twist/linear_x" />
     </node>
 
     <node pkg="rostopic" type="rostopic" name="fake_odom_x_pub" 
-        args=" pub -r 10 /data/robot/odom/twist/linear/x std_msgs/Float64 'data: 1.0'"/>
+        args=" pub -r 10 /data/robot/odom/twist/linear_x std_msgs/Float64 'data: 1.0'"/>
 
 </launch>
