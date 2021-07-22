@@ -7,7 +7,7 @@ Benchmarking for these components per test will be stored in [araig_benchmarks](
 ## Install steps
 * 1. `rosdep install --from-paths src --ignore-src`
 * 2. `pip install -r requirement.txt`
-* 3. `catkin_build`
+* 3. `catkin_make`
 ## Note
 * python dependencies:
     * you can use `rosdep resolve <pkg name>` to check if this pkg is defined in [rosdep/python.yaml](https://github.com/ros/rosdistro/blob/master/rosdep/python.yaml). If it can be found, it should be able to be installed by rosdep. If not, this pkg will be defined in [requirement.txt](./requirement.txt). That's why you should run `pip install -r requirement.txt`
