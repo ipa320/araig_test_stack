@@ -1,0 +1,11 @@
+<launch>
+
+    <rosparam command="load" file="$(find araig_calculators)/config/multi_logging.yaml" />
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_1" output="screen">
+        <remap from="/in_start" to="/start"/>
+        <remap from="/in_stop" to="/stop"/>
+        <remap from="/out_duration" to="/stopwatch_1/duration"/>
+    </node>
+
+</launch>

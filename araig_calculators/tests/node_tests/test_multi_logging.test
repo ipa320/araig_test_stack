@@ -1,0 +1,59 @@
+<launch>
+
+    <rosparam command="load" file="$(find araig_calculators)/config/multi_logging.yaml" />
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_1" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+        <remap from="/out_duration" to="/test/duration"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_2" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_3" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_4" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_5" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_6" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_7" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_8" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_9" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <node pkg="araig_calculators" type="diff_time_node" name="stopwatch_10" output="screen">
+        <remap from="/in_start" to="/test/start"/>
+        <remap from="/in_stop" to="/test/stop"/>
+    </node>
+
+    <test test-name="test_diff_time_node" pkg="araig_calculators" type="test_diff_time_node.py">
+    </test>
+
+</launch>

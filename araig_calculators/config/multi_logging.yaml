@@ -1,0 +1,25 @@
+calculators:
+  robot_type: "test_multilogging"
+  test_type: "test1_braking"
+
+  stopwatch_1:
+    if_log: True
+  stopwatch_2:
+    if_log: True
+  stopwatch_3:
+    if_log: True
+  stopwatch_4:
+    if_log: True
+  stopwatch_5:
+    if_log: True
+  stopwatch_6:
+    if_log: True
+  stopwatch_7:
+    if_log: True
+  stopwatch_8:
+    if_log: True
+  stopwatch_9:
+    if_log: True
+  stopwatch_10:
+    if_log: True
+

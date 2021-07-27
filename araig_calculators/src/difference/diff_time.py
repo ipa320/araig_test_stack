@@ -52,7 +52,7 @@ class diffTime(BaseCalculator):
             if self._prestate_start == False and \
                 temp[self._sub_topic_start].data == True:
                     self._timestamp_start = temp[self._sub_topic_start].header.stamp
-                    self.log_msg["start"] = float( self._timestamp_start.secs + float( self._timestamp_start.nsecs*(1e-9)))
+                    # self.log_msg["start"] = float( self._timestamp_start.secs + float( self._timestamp_start.nsecs*(1e-9)))
                     rospy.loginfo("{}: Started counting".format(rospy.get_name()))
             
             self._prestate_start = temp[self._sub_topic_start].data
@@ -64,7 +64,7 @@ class diffTime(BaseCalculator):
                 
                     self._timestamp_stop = temp[self._sub_topic_stop].header.stamp
                     rospy.loginfo("{}: Stopped counting".format(rospy.get_name()))
-                    self.log_msg["stop"] = float( self._timestamp_stop.secs + float( self._timestamp_stop.nsecs*(1e-9)))
+                    # self.log_msg["stop"] = float( self._timestamp_stop.secs + float( self._timestamp_stop.nsecs*(1e-9)))
             
                     stopwatch = self._timestamp_stop - self._timestamp_start
                     pub_msg = self.PubDict[self._pub_topic]()
@@ -74,9 +74,11 @@ class diffTime(BaseCalculator):
 
                     self.PubDiag[self._pub_topic].publish(pub_msg)
                     rospy.loginfo("{}: Duration: {}".format(rospy.get_name(), duration))
-                    self.log_msg["Duration"] = {}
-                    self.log_msg["Duration"]['timestamp'] = float(pub_msg.header.stamp.secs + float(pub_msg.header.stamp.nsecs*(1e-9)))
-                    self.log_msg["Duration"]['data'] = duration
+                    self.log_msg[rospy.get_name()] = {}
+                    self.log_msg[rospy.get_name()]['timestamp'] = float(pub_msg.header.stamp.secs + float(pub_msg.header.stamp.nsecs*(1e-9)))
+                    self.log_msg[rospy.get_name()]['data'] = duration
+                    self.log_msg[rospy.get_name()]["start"] = float( self._timestamp_start.secs + float( self._timestamp_start.nsecs*(1e-9)))
+                    self.log_msg[rospy.get_name()]["stop"] = float( self._timestamp_stop.secs + float( self._timestamp_stop.nsecs*(1e-9)))
                     if self.log_filename != "":
                         self.login_file(self.log_msg)
                         self.log_msg = {}

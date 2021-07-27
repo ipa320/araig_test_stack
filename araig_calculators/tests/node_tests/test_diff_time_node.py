@@ -26,7 +26,7 @@ class TestDiffTime(unittest.TestCase):
         self.count = 0
 
     def test_expected(self):
-        while self.count < 3:
+        while self.count < 10:
             self.count += 1
             # pub stop signal first
             pub_signal = BoolStamped()
