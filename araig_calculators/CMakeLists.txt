@@ -33,6 +33,7 @@ if (CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   include_directories(include ${catkin_INCLUDE_DIRS})
 
+  add_rostest(tests/node_tests/test_edge_detector_node.test)
   # TODO:Fix tests and add them back later. Refer issue 37
   # add_rostest(tests/node_tests/test_diff_pose_temporal_node.test)
   add_rostest(tests/node_tests/test_diff_time_node.test)
