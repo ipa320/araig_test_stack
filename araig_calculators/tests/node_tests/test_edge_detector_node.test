@@ -1,0 +1,15 @@
+<launch>
+
+    <node pkg="araig_calculators" type="edge_detector_node" name="test_edge_detector_node" output="screen">
+        <remap from="/in_bool" to="/test/control_bool"/>
+        <remap from="/out_high" to="/test/result_high"/>
+        <remap from="/out_low" to="/test/result_low"/>
+    </node>
+
+    <test test-name="test_edge_detector" pkg="araig_calculators" type="test_edge_detector_node.py">
+        <remap from="/out_bool" to="/test/control_bool"/>
+        <remap from="/in_high" to="/test/result_high"/>
+        <remap from="/in_low" to="/test/result_low"/>
+    </test>
+
+</launch>
