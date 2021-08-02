@@ -21,3 +21,9 @@ Inherit **[comparator](src/comparator/comparator.py)**, only need to change **Co
    * name: stopWatch
    * input: any two topics (compare header stamp)
    * output: duration in float64
+
+* [edge detector](src/comparators/edge_detector.py) :
+   * name: edgeDetector
+   * inputs: 1 BoolStamped - /in_bool
+   * outputs: 2 BoolStamped - /out_high, /out_low
+   * operation: Detects a rising or falling edge. If rising edge: high=rue/low=false; if falling edge: high=false/low=true
