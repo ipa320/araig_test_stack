@@ -33,7 +33,8 @@ class TimeSeriesLoggerClass(BaseLogger):
         super(TimeSeriesLoggerClass, self).__init__(
             param_list = param_list, \
             sub_dict = extend_subscribers_dict)
-
+    
+    def start_logger(self):
         try:
             while not rospy.is_shutdown():
                 self.main_loop() 
