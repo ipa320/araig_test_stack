@@ -125,7 +125,7 @@ class BaseCalculator(object):
             return None
 
     def login_file(self, log_msg):
-        rospy.loginfo("{}: Writing result into {}".format(rospy.get_name(), self.get_logfile_path()))
+        # rospy.loginfo("{}: Writing result into {}".format(rospy.get_name(), self.get_logfile_path()))
         if self.get_logfile_path is not None:
             try:
                 open(self.get_logfile_path(), 'a+')

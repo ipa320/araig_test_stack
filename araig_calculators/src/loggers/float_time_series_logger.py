@@ -7,8 +7,9 @@ from std_msgs.msg import Float64
 
 class FloatSeriesLoggerClass(TimeSeriesLoggerClass):
     def __init__(self):
-        rospy.Subscriber("/in_float", Float64, self.data_subscriber)
         super(FloatSeriesLoggerClass, self).__init__()
+        rospy.Subscriber("/in_float", Float64, self.data_subscriber)
+        self.start_logger()
 
     def data_subscriber(self, msg):
         with self.lock_data:
