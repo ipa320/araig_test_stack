@@ -1,0 +1,44 @@
+<launch>
+
+    <arg name="loops" default="20" />
+    <arg name="sensor_rate" default="100" />
+    <arg name="path" default="$(env HOME)/ARAIG" />
+
+    <!-- Benchmarker -->
+    <node pkg="araig_test_runners" type="bench_braking" name="bench_braking_node" 
+        args="$(arg loops) $(arg sensor_rate) $(arg path)" output="screen">
+        <!-- Provides /data/interpreter/location/robot & /data/robot/odom/twist/linear_x -->
+    </node>
+
+    <!-- robot_reached_max_vel_node -->
+    <param name="/calculators/robot_reached_max_vel_node/param" type="double" value="0.5" />
+    <param name="/calculators/robot_reached_max_vel_node/tolerance" type="double" value="0.05" />
+    <node pkg="araig_calculators" type="comp_param_node" name="robot_reached_max_vel_node" output="screen">
+        <remap from="/in_float" to="/data/robot/odom/twist/linear_x"/>
+        <remap from="/out_bool" to="/signal/calc/robot_has_max_vel"/>
+    </node>
+
+    <!-- robot_has_stopped_node -->
+    <param name="/calculators/robot_has_stopped_node/param" type="double" value="0.0" />
+    <param name="/calculators/robot_has_stopped_node/tolerance" type="double" value="0.05" />
+    <node pkg="araig_calculators" type="comp_param_node" name="robot_has_stopped_node" output="screen">
+        <remap from="/in_float" to="/data/robot/odom/twist/linear_x"/>
+        <remap from="/out_bool" to="/signal/calc/robot_has_stopped"/>
+    </node>
+
+    <!-- braking_distance_node -->
+    <node pkg="araig_calculators" type="diff_pose_temporal_node" name="braking_distance_node" output="screen">
+        <remap from="/in_start" to="/signal/runner/stop_robot"/>
+        <remap from="/in_stop" to="/signal/calc/robot_has_stopped"/>
+        <remap from="/in_pose" to="/data/interpreter/location/robot"/>
+        <remap from="/out_disp_position" to="/data/calc/braking_distance"/>
+    </node>
+
+    <!-- braking_time_node -->
+    <node pkg="araig_calculators" type="diff_time_node" name="braking_time_node" output="screen">
+        <remap from="/in_start" to="/signal/runner/stop_robot"/>
+        <remap from="/in_stop" to="/signal/calc/robot_has_stopped"/>
+        <remap from="/out_duration" to="/data/calc/braking_time"/>
+    </node>
+
+</launch>
