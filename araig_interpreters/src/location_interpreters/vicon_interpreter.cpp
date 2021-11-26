@@ -72,8 +72,9 @@ public:
                         topicName += "/" + lv_elems[i];
                     }
                 }
+                
                 // result of split is like /vicon/string: " ", "vicon", "string"   
-                  if ( lv_elems[1] == "vicon" )
+                  if ( lv_elems[1] == "vicon" && it->datatype=="geometry_msgs/TransformStamped")
                 {
                    viconTopics.push_back(topicName);
                    ROS_INFO_STREAM("get a topic of vicon "<<topicName);

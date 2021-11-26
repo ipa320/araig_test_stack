@@ -6,6 +6,10 @@
     <node pkg="tf" type="static_transform_publisher" name="vicon_origin" 
     args="$(arg origin_pos) /map /vicon/world 1"/>
 
-    <node pkg="vicon_setorigin" type="vicon_interpreter" name="vicon_interpreter" output="screen"/>
+    <include file="$(find vicon_bridge)/launch/vicon.launch">
+        <arg name="datastream_hostport" default="192.168.10.1:801"/>
+    </include>
+
+    <node pkg="araig_interpreter" type="vicon_interpreter" name="vicon_interpreter" output="screen"/>
     
 </launch>
