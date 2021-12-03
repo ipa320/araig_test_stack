@@ -10,14 +10,18 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <algorithm>
 
 class vicon_interpreter
 {
 private:
+    boost::mutex topic_mutex_;
     ros::NodeHandle nh;
     ros::NodeHandle nh_priv;
 
     std::vector<std::string> viconTopics;
+    std::vector<std::string> viconTopicsNew;
     ros::master::V_TopicInfo viconTopicInfos;
 
     tf::TransformListener tf_ls;
@@ -58,13 +62,13 @@ public:
         }
     }
 
-    void getViconTopic(ros::master::V_TopicInfo& topicInfos, std::vector<std::string>& viconTopics)
+    void getViconTopic()
     {
         std::vector<std::string> lv_elems;
-        for(ros::master::V_TopicInfo::iterator it = topicInfos.begin();
-            it != topicInfos.end(); it++){
+        for(ros::master::V_TopicInfo::iterator it = viconTopicInfos.begin();
+            it != viconTopicInfos.end(); it++){
                 boost::algorithm::split( lv_elems, it->name, boost::algorithm::is_any_of( "/" ) );
-                ROS_INFO_STREAM("examining topic "<<it->name);
+                //ROS_INFO_STREAM("examining topic "<<it->name);
 
                 std::string topicName = "";
                 for(uint i=0; i<lv_elems.size(); ++i){
@@ -76,52 +80,74 @@ public:
                 // result of split is like /vicon/string: " ", "vicon", "string"   
                   if ( lv_elems[1] == "vicon" && it->datatype=="geometry_msgs/TransformStamped")
                 {
-                   viconTopics.push_back(topicName);
-                   ROS_INFO_STREAM("get a topic of vicon "<<topicName);
+                    if(std::find(viconTopics.begin(), viconTopics.end(), topicName) == viconTopics.end()
+                        && std::find(viconTopicsNew.begin(), viconTopicsNew.end(), topicName) == viconTopicsNew.end()){
+                        viconTopicsNew.push_back(topicName);
+                        ROS_INFO_STREAM("get a topic of vicon "<<topicName);
+                        ROS_INFO_STREAM("length of viconTopicsNew is "<<viconTopicsNew.size());
+                    }
                 }
             }
     }
 
     void viconCallback(const geometry_msgs::TransformStamped::ConstPtr& msg, std::string topicName)
     {
+        ROS_INFO_STREAM("sub of topic: "<<topicName<<" gets a msg");
         geometry_msgs::PoseStamped poseMsg;
         geometry_msgs::PoseStamped poseMsgTf;
         stampedTrans2Pose(*msg, poseMsg);
+        ros::Time now = ros::Time(0);
+
+        poseMsg.header.stamp = now;
+
         doTransform(poseMsg, poseMsgTf);
         viconPubList[topicName].publish(poseMsgTf);
     }
 
-    void makePubSub(std::vector<std::string>& topicList, 
-                std::map<std::string, ros::Publisher>& viconPubList,
-                std::map<std::string, ros::Subscriber>& viconSubList)
+    void createThreadPubSub()
     {
-        for(auto it=topicList.begin();
-        it != topicList.end(); it++){
-            std::string topic_name = (*it).data();
-            std::string pub_name = "/interpreter" + topic_name;
-            std::string sub_name = "/vicon" + topic_name;
+        boost::thread PubSubThread(&vicon_interpreter::makePubSub, this);
+    }
 
-            ros::Publisher pub = nh.advertise<geometry_msgs::PoseStamped>(pub_name, 10);
-            viconPubList.insert(std::make_pair(topic_name, pub));
+    void makePubSub()
+    {
+        boost::mutex::scoped_lock lock(topic_mutex_);
+        if(lock.owns_lock()){
+            for(auto it=viconTopicsNew.begin();
+            it != viconTopicsNew.end(); it++){
+                std::string topic_name = (*it).data();
+                ROS_INFO_STREAM("creating pub and sub on topic"<<topic_name);
+                std::string pub_name = "/interpreter" + topic_name;
+                std::string sub_name = "/vicon" + topic_name;
 
-            ros::Subscriber sub = nh.subscribe<geometry_msgs::TransformStamped>(sub_name, 10, boost::bind(&vicon_interpreter::viconCallback, this, _1, topic_name));
-            viconSubList.insert(std::make_pair(topic_name, sub));
+                ros::Publisher pub = nh.advertise<geometry_msgs::PoseStamped>(pub_name, 10);
+                viconPubList.insert(std::make_pair(topic_name, pub));
+
+                ros::Subscriber sub = nh.subscribe<geometry_msgs::TransformStamped>(sub_name, 10, boost::bind(&vicon_interpreter::viconCallback, this, _1, topic_name));
+                viconSubList.insert(std::make_pair(topic_name, sub));
+            }
+            viconTopics.insert(viconTopics.end(), viconTopicsNew.begin(), viconTopicsNew.end());
+            viconTopicsNew.clear();
+            lock.unlock();
+            ROS_INFO_STREAM("lock for PubSub thread cancelled");
         }
     }
 
     vicon_interpreter()
     {
-        //ROS_INFO_STREAM("Interpreter on!");
-        if(ros::master::getTopics(viconTopicInfos)){
-            //ROS_INFO_STREAM("[Interpreter] get topics");
-            getViconTopic(viconTopicInfos, viconTopics);
-            if(!viconTopics.empty()){
-                //ROS_INFO_STREAM("[Interpreter] get vicon topics");
-                makePubSub(viconTopics, viconPubList, viconSubList);
+        while(ros::ok()){
+            boost::mutex::scoped_try_lock lock(topic_mutex_);
+            if(lock.owns_lock()){
+                if(ros::master::getTopics(viconTopicInfos) && viconTopicsNew.empty()){
+                    getViconTopic();
+                }else{
+                    lock.unlock();
+                    createThreadPubSub();
+                }
             }
         }
-    }
 
+    }
 };
 
 
@@ -129,7 +155,10 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "vicon_interpreter");
     ROS_INFO_STREAM("Interpreter node generated!");
+    ros::AsyncSpinner aspin(1);
+    aspin.start();
     vicon_interpreter interpreter;
-    ros::spin();
+    aspin.stop();
+    //ros::spin();
     return 0;
 }
