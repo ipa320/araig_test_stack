@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="araig_gui" type="my_plugin" name="gui_node" output="screen"/>
+
+</launch>

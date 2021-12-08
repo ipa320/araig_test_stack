@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MyPluginWidget</class>
+ <widget class="QWidget" name="MyPluginWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>822</width>
+    <height>575</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Test1</string>
+  </property>
+  <widget class="QWidget" name="centralWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>-10</x>
+     <y>0</y>
+     <width>811</width>
+     <height>561</height>
+    </rect>
+   </property>
+   <widget class="QGroupBox" name="gbTestControl">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>70</y>
+      <width>201</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Test Control</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>101</width>
+       <height>151</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="pbsTestControl">
+      <item>
+       <widget class="QPushButton" name="pbTestStart">
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbTestStop">
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbTestReset">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="gbTestState">
+    <property name="geometry">
+     <rect>
+      <x>410</x>
+      <y>190</y>
+      <width>311</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Test State</string>
+    </property>
+    <widget class="QLabel" name="lbTestState">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>60</y>
+       <width>191</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lbTestResult">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>120</y>
+       <width>201</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Progress:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>91</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Result:</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="gbTestRecord">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>300</y>
+      <width>201</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Record Result</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+    <widget class="QWidget" name="layoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>101</width>
+       <height>151</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="pbsTestRecord">
+      <item>
+       <widget class="QPushButton" name="pbTestSucc">
+        <property name="text">
+         <string>Succeed</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbTestFail">
+        <property name="text">
+         <string>Fail</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>822</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>8</width>
+     <height>19</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>3</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

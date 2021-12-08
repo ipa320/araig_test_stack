@@ -86,5 +86,8 @@
         args="--multiplot-config $(find turtlebot3_sim_tests)/config/plotter/speed_plot.xml --multiplot-run-all">
     </node>
 
+    <!-- ARAIG GUI -->
+    <node pkg="araig_gui" type="my_plugin" name="gui_node" output="screen"/>
+
 </launch>
  

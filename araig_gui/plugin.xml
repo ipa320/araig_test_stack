@@ -1,0 +1,25 @@
+<library path="lib/libaraig_gui">
+  <class name="araig_gui/MyPlugin" type="MyPlugin" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      GUI for ARAIG tests
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <group>
+        <label>Custom</label>
+        <icon type="theme">folder</icon>
+        <statustip>Custom plugin</statustip>
+      </group>
+      <label>Araig GUI</label>
+      <icon type="theme">system-help</icon>
+      <statustip>Great user interface to provide real value.</statustip>
+    </qtgui>
+  </class>
+</library>
