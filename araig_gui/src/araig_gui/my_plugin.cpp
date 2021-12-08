@@ -136,10 +136,11 @@ void MyPlugin::outputTestState()
   bool succ = output_states_[1];
   bool failed = output_states_[2];
 
-  ROS_INFO_STREAM("[GUI]: the test is completed? "<<completed);
-  ROS_INFO_STREAM("[GUI]: the state of succ is "<<succ);
-  ROS_INFO_STREAM("[GUI]: the state of failed is "<<failed);
-  ROS_INFO_STREAM("[GUI]: the state of ready is "<<test_ready_);
+// for Debug
+//  ROS_INFO_STREAM("[GUI]: the test is completed? "<<completed);
+//  ROS_INFO_STREAM("[GUI]: the state of succ is "<<succ);
+//  ROS_INFO_STREAM("[GUI]: the state of failed is "<<failed);
+//  ROS_INFO_STREAM("[GUI]: the state of ready is "<<test_ready_);
 
   if(!completed && !test_ready_ && !result_recorded_) // test is running
   {
@@ -224,16 +225,18 @@ void MyPlugin::on_pbTestStop_clicked()
   input_states_[2] = false;
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
-  output_states_[0] = true;
-  srand(time(NULL));
-  if(rand()%100 >= 50)
-  {
-    output_states_[1] = true;
-  }
-  else
-  {
-    output_states_[2] = true;
-  }
+
+// Test with itself
+//  output_states_[0] = true;
+//  srand(time(NULL));
+//  if(rand()%100 >= 50)
+//  {
+//    output_states_[1] = true;
+//  }
+//  else
+//  {
+//    output_states_[2] = true;
+//  }
   outputTestState();
 }
 
