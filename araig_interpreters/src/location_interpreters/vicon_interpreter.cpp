@@ -71,6 +71,7 @@ public:
                 //ROS_INFO_STREAM("examining topic "<<it->name);
 
                 std::string topicName = "";
+                //use substring
                 for(uint i=0; i<lv_elems.size(); ++i){
                     if(i>1){
                         topicName += "/" + lv_elems[i];
@@ -107,6 +108,7 @@ public:
     void createThreadPubSub()
     {
         boost::thread PubSubThread(&vicon_interpreter::makePubSub, this);
+        PubSubThread.join();
     }
 
     void makePubSub()
