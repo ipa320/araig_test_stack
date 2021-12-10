@@ -9,15 +9,12 @@ ffmpeg for generating video from images
 > sudo apt install ffmpeg
 
 ## Usage
-1. Edit the saving path as **dir** in *export_video.sh*, bag file name and path to bag files.
+1. Edit the variables:**BAGFILE**, **PATH2BAG**, **dir** and **rosws** at the beginning of *export_video.sh*:
+- BAGFILE: filename of bag file
+- PATH2BAG: path to the directory containing bag file
+- dir: directory where to same frames and videos
+- rosws: your ros workspace
 
-2. Run the script
-    >cd /path/to/catkin_ws/src/araig_test_stack/araig_utils
-    >./launch/export_video.sh
+2. Run the script *export_video.sh*
 
 3. Go to ${dir} to check the videos.
-
-## TODO:
-1. merge 2 launch files:
-    
-    2 launch files each for saving image for one camera, in which one bag file will be played once and the images from one topic will be saved and used for generating video.
