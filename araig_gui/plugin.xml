@@ -1,5 +1,5 @@
 <library path="lib/libaraig_gui">
-  <class name="araig_gui/araig_gui" type="araig_gui" base_class_type="rqt_gui_cpp::Plugin">
+  <class name="araig_gui/AraigGui" type="AraigGui" base_class_type="rqt_gui_cpp::Plugin">
     <description>
       GUI for ARAIG tests
     </description>
