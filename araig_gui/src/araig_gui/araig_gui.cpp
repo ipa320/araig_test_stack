@@ -1,8 +1,8 @@
 /*
-  Copyright 2016 Lucas Walter
+  Copyright 2021 Changxuan Li
 */
 
-#include "araig_gui/my_plugin.h"
+#include "araig_gui/araig_gui.h"
 #include <pluginlib/class_list_macros.h>
 #include <QStringList>
 #include <ros/ros.h>
@@ -18,27 +18,19 @@
 #include <time.h>
 #include <sstream>
 
-MyPlugin::MyPlugin()
+AraigGui::AraigGui()
   : rqt_gui_cpp::Plugin()
   , widget_(0)
 {
-  // Constructor is called first before initPlugin function, needless to say.
-
-  // give QObjects reasonable names
-  setObjectName("MyPlugin");
+  setObjectName("AraigGui");
 }
 
-void MyPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
+void AraigGui::initPlugin(qt_gui_cpp::PluginContext& context)
 {
-  // access standalone command line arguments
   QStringList argv = context.argv();
-  // create QWidget
   widget_ = new QWidget();
-  // extend the widget with all attributes and children from UI file
-
 
   ui_.setupUi(widget_);
-  // add widget to the user interface
   context.addWidget(widget_);
   connect(ui_.pbTestStart, SIGNAL(clicked()), this, SLOT(on_pbTestStart_clicked()));
   connect(ui_.pbTestStop, SIGNAL(clicked()), this, SLOT(on_pbTestStop_clicked()));
@@ -62,24 +54,21 @@ void MyPlugin::initPlugin(qt_gui_cpp::PluginContext& context)
 
 }
 
-void MyPlugin::shutdownPlugin()
+void AraigGui::shutdownPlugin()
 {
-  // unregister all publishers here
 }
 
-void MyPlugin::saveSettings(qt_gui_cpp::Settings& plugin_settings,
+void AraigGui::saveSettings(qt_gui_cpp::Settings& plugin_settings,
     qt_gui_cpp::Settings& instance_settings) const
 {
-  // instance_settings.setValue(k, v)
 }
 
-void MyPlugin::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
+void AraigGui::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
     const qt_gui_cpp::Settings& instance_settings)
 {
-  // v = instance_settings.value(k)
 }
 
-void MyPlugin::spawnPubs()
+void AraigGui::spawnPubs()
 {
   for(int i=0; i<num_inputs_; i++)
   {
@@ -90,18 +79,18 @@ void MyPlugin::spawnPubs()
   }
 }
 
-void MyPlugin::spawnSubs()
+void AraigGui::spawnSubs()
 {
   for(int i=0; i<num_outputs_; i++)
   {
     std::string topicName = "/signal/runner/" + name_outputs_[static_cast<std::vector<std::string>::size_type>(i)];
     output_subs_[static_cast<std::vector<ros::Subscriber>::size_type>(i)]
-        = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&MyPlugin::callbackBool, this, _1, topicName));
+        = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&AraigGui::callbackBool, this, _1, topicName));
     ROS_INFO_STREAM("[GUI]: Spawned output topic subscriber " << i << " for : " << topicName);
   }
 }
 
-int MyPlugin::getIndexInVector(std::vector<std::string> vec, std::string topicName)
+int AraigGui::getIndexInVector(std::vector<std::string> vec, std::string topicName)
 {
   auto it = find(vec.begin(), vec.end(), topicName);
   if(it != vec.end())
@@ -115,7 +104,7 @@ int MyPlugin::getIndexInVector(std::vector<std::string> vec, std::string topicNa
   }
 }
 
-void MyPlugin::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const std::string &topicName)
+void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const std::string &topicName)
 {
   std::vector<std::string> nameElems;
   boost::split(nameElems, topicName, [](char c){return c == '/';});
@@ -129,18 +118,12 @@ void MyPlugin::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const 
   }
 }
 
-void MyPlugin::outputTestState()
+void AraigGui::outputTestState()
 {
   //output: 0: completed, 1: succeeded, 2:failed
   bool completed = output_states_[0];
   bool succ = output_states_[1];
   bool failed = output_states_[2];
-
-// for Debug
-//  ROS_INFO_STREAM("[GUI]: the test is completed? "<<completed);
-//  ROS_INFO_STREAM("[GUI]: the state of succ is "<<succ);
-//  ROS_INFO_STREAM("[GUI]: the state of failed is "<<failed);
-//  ROS_INFO_STREAM("[GUI]: the state of ready is "<<test_ready_);
 
   if(!completed && !test_ready_ && !result_recorded_) // test is running
   {
@@ -182,7 +165,7 @@ void MyPlugin::outputTestState()
   }
 }
 
-void MyPlugin::pubPublish(int idx)
+void AraigGui::pubPublish(int idx)
 {
   araig_msgs::BoolStamped msg;
   msg.header.stamp = ros::Time::now();
@@ -191,7 +174,7 @@ void MyPlugin::pubPublish(int idx)
   ros::spinOnce();
 }
 
-void MyPlugin::stateInit()
+void AraigGui::stateInit()
 {
   for (auto it = output_states_.begin();it!=output_states_.end();it++) {
     *it = false;
@@ -203,9 +186,9 @@ void MyPlugin::stateInit()
   result_recorded_ = false;
 }
 
-PLUGINLIB_EXPORT_CLASS(MyPlugin, rqt_gui_cpp::Plugin)
+PLUGINLIB_EXPORT_CLASS(AraigGui, rqt_gui_cpp::Plugin)
 
-void MyPlugin::on_pbTestStart_clicked()
+void AraigGui::on_pbTestStart_clicked()
 {
   //input: 0:start, 1:stop, 2:reset, 3:succ, 4:failed
   //output: 0: completed, 1: succeeded, 2:failed
@@ -218,7 +201,7 @@ void MyPlugin::on_pbTestStart_clicked()
   outputTestState();
 }
 
-void MyPlugin::on_pbTestStop_clicked()
+void AraigGui::on_pbTestStop_clicked()
 {
   input_states_[0] = false;
   input_states_[1] = true;
@@ -240,7 +223,7 @@ void MyPlugin::on_pbTestStop_clicked()
   outputTestState();
 }
 
-void MyPlugin::on_pbTestReset_clicked()
+void AraigGui::on_pbTestReset_clicked()
 {
   input_states_[0] = false;
   input_states_[1] = false;
@@ -252,7 +235,7 @@ void MyPlugin::on_pbTestReset_clicked()
   outputTestState();
 }
 
-void MyPlugin::on_pbTestSucc_clicked()
+void AraigGui::on_pbTestSucc_clicked()
 {
   input_states_[3] = true;
   input_states_[4] = false;
@@ -262,7 +245,7 @@ void MyPlugin::on_pbTestSucc_clicked()
   outputTestState();
 }
 
-void MyPlugin::on_pbTestFail_clicked()
+void AraigGui::on_pbTestFail_clicked()
 {
   input_states_[3] = false;
   input_states_[4] = true;

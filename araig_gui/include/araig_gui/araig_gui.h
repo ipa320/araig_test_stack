@@ -1,8 +1,8 @@
 /*
-  Copyright 2016 Lucas Walter
+  Copyright 2021 Changxuan Li
 */
-#ifndef ARAIG_GUI_MY_PLUGIN_H
-#define ARAIG_GUI_MY_PLUGIN_H
+#ifndef ARAIG_GUI_ARAIG_GUI_H
+#define ARAIG_GUI_ARAIG_GUI_H
 
 #include <ros/macros.h>
 
@@ -19,14 +19,12 @@
 #include <boost/bind.hpp>
 
 
-class MyPlugin
+class AraigGui
   : public rqt_gui_cpp::Plugin
 {
-  // enable meta-object's support
   Q_OBJECT
 public:
-  // declare constructor and all slots functions(why with virtual)
-  MyPlugin();
+  AraigGui();
   virtual void initPlugin(qt_gui_cpp::PluginContext& context);
   virtual void shutdownPlugin();
   virtual void saveSettings(qt_gui_cpp::Settings& plugin_settings,
