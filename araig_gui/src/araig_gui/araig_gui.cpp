@@ -206,18 +206,6 @@ void AraigGui::on_pbTestStop_clicked()
   input_states_[2] = false;
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
-
-  // Test with itself
-    output_states_[0] = true;
-    srand(time(NULL));
-    if(rand()%100 >= 50)
-    {
-      output_states_[1] = true;
-    }
-    else
-    {
-      output_states_[2] = true;
-    }
   outputTestState();
 }
 
