@@ -50,8 +50,8 @@ endif()
 
 include_directories(
   include
-  ${CMAKE_CURRENT_BINARY_DIR}/..
   ${catkin_INCLUDE_DIRS}
+  ${PROJECT_BINARY_DIR}
 )
 
 add_library(${PROJECT_NAME}

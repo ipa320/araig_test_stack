@@ -7,7 +7,7 @@
 #include <ros/macros.h>
 
 #include <rqt_gui_cpp/plugin.h>
-#include <araig_gui/ui_my_plugin.h>
+#include <ui_araig_gui.h>
 #include <QWidget>
 #include <QStringList>
 #include <QSet>
