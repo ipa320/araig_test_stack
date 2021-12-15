@@ -186,8 +186,6 @@ void AraigGui::stateInit()
   result_recorded_ = false;
 }
 
-PLUGINLIB_EXPORT_CLASS(AraigGui, rqt_gui_cpp::Plugin)
-
 void AraigGui::on_pbTestStart_clicked()
 {
   //input: 0:start, 1:stop, 2:reset, 3:succ, 4:failed
@@ -209,17 +207,17 @@ void AraigGui::on_pbTestStop_clicked()
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
 
-// Test with itself
-//  output_states_[0] = true;
-//  srand(time(NULL));
-//  if(rand()%100 >= 50)
-//  {
-//    output_states_[1] = true;
-//  }
-//  else
-//  {
-//    output_states_[2] = true;
-//  }
+  // Test with itself
+    output_states_[0] = true;
+    srand(time(NULL));
+    if(rand()%100 >= 50)
+    {
+      output_states_[1] = true;
+    }
+    else
+    {
+      output_states_[2] = true;
+    }
   outputTestState();
 }
 
@@ -254,3 +252,6 @@ void AraigGui::on_pbTestFail_clicked()
   ROS_INFO_STREAM("[GUI]: Result recorded!");
   outputTestState();
 }
+
+PLUGINLIB_EXPORT_CLASS(AraigGui, rqt_gui_cpp::Plugin)
+
