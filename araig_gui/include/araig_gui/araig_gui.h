@@ -37,6 +37,7 @@ protected:
   std::vector<ros::Publisher> input_pubs_;
   std::vector<ros::Subscriber> output_subs_;
 private:
+  bool interrupt_test_ = false;
   bool test_ready_ = false;
   bool result_recorded_ = false;
   int num_inputs_;

@@ -108,7 +108,6 @@ void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const 
 {
   std::vector<std::string> nameElems;
   boost::split(nameElems, topicName, [](char c){return c == '/';});
-  ROS_INFO_STREAM("[GUI]: get data on topic "<<nameElems.back());
 
   int idx = getIndexInVector(name_outputs_, nameElems.back());
   if(idx !=-1)
@@ -130,7 +129,7 @@ void AraigGui::outputTestState()
     ui_.lbTestState->setText("Test running!");
     ui_.lbTestResult->setText("Waiting for result...");
   }
-  else if(completed && !result_recorded_) // test terminates
+  else if(completed && !result_recorded_ && !interrupt_test_) // test completed
   {
     if(failed == succ)
     {
@@ -153,10 +152,15 @@ void AraigGui::outputTestState()
     ui_.lbTestState->setText("Test ready!");
     ui_.lbTestResult->setText("Wait for start!");
   }
-  else if (completed && result_recorded_)
+  else if (completed && result_recorded_ && !interrupt_test_) // test is recorded
   {
     ui_.lbTestState->setText("Please reset!");
     ui_.lbTestResult->setText("Result recorded!");
+  }
+  else if (completed && interrupt_test_) // test interrupted
+  {
+    ui_.lbTestState->setText("Test interrupted!");
+    ui_.lbTestResult->setText("Test failed!");
   }
   else // otherwise
   {
@@ -182,6 +186,7 @@ void AraigGui::stateInit()
   for (auto it = input_states_.begin();it!=input_states_.end();it++) {
     *it = false;
   }
+  interrupt_test_ = false;
   test_ready_ = true;
   result_recorded_ = false;
 }
@@ -206,6 +211,7 @@ void AraigGui::on_pbTestStop_clicked()
   input_states_[2] = false;
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
+  interrupt_test_ = true;
   outputTestState();
 }
 
