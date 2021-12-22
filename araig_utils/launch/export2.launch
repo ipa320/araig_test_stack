@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="rosbag" type="play" name="rosbag" required="true" args="$(arg bag_path)/$(arg bag)"/>
+
+    <node pkg="image_view" type="image_saver" name="image_saver" cwd="ROS_HOME" output="screen">
+      <remap from="/image" to="/sensor_usb_cam2/image_raw"/>
+      <param name="filename_format" value="frame%04i.jpg"/>
+    </node>
+  </launch>
+  
