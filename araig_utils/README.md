@@ -14,6 +14,7 @@ ffmpeg for generating video from images
 - PATH2BAG: path to the directory containing bag file
 - dir: directory where to same frames and videos
 - rosws: your ros workspace
+- rosdir: by default = ~/.ros, change if you have other path to ROS_HOME
 
 2. Run the script *export_video.sh*
 
