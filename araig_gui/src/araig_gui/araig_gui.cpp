@@ -41,6 +41,9 @@ void AraigGui::initPlugin(qt_gui_cpp::PluginContext& context)
   nh_ = getNodeHandle();
   name_inputs_ = {"test_completed", "test_succeeded", "test_failed"};
   name_outputs_ = {"start_test", "interrupt_test", "reset_test", "check_succeed", "check_failed"};
+  // gui node also subscribe to it self to get its text updated
+  name_inputs_.insert(name_inputs_.end(), name_outputs_.begin(), name_outputs_.end());
+
   num_inputs_ = int(name_inputs_.size());
   num_outputs_ = int(name_outputs_.size());
   input_subs_.resize(static_cast<std::vector<ros::Publisher>::size_type>(num_inputs_));
@@ -50,6 +53,7 @@ void AraigGui::initPlugin(qt_gui_cpp::PluginContext& context)
   spawnPubs();
   spawnSubs();
   stateInit();
+  outputTestState();
   ROS_INFO_STREAM("[GUI]: ARAIG_TEST_GUI initialized!");
 
 }
@@ -81,10 +85,18 @@ void AraigGui::spawnPubs()
 
 void AraigGui::spawnSubs()
 {
-  for(int i=0; i<num_inputs_; i++)
+  int i;
+  for(i=0; i<num_inputs_ - num_outputs_; i++)
   {
-    std::string topicName = "/signal/runner/" + name_inputs_[static_cast<std::vector<std::string>::size_type>(i)];
-    input_subs_[static_cast<std::vector<ros::Subscriber>::size_type>(i)]
+    std::string topicName = "/signal/runner/" + name_inputs_[i];
+    input_subs_[i]
+        = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&AraigGui::callbackBool, this, _1, i));
+    ROS_INFO_STREAM("[GUI]: Spawned input topic subscriber " << i << " for : " << topicName);
+  }
+  for(; i<num_inputs_; i++)
+  {
+    std::string topicName = "/signal/ui/" + name_inputs_[i];
+    input_subs_[i]
         = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&AraigGui::callbackBool, this, _1, i));
     ROS_INFO_STREAM("[GUI]: Spawned input topic subscriber " << i << " for : " << topicName);
   }
@@ -92,60 +104,112 @@ void AraigGui::spawnSubs()
 
 void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const int &topicIdx)
 {
-  input_states_[static_cast<std::vector<bool>::size_type>(topicIdx)] = msg->data? true:false;
+  input_states_[topicIdx] = msg->data? true:false;
+  if(input_states_[5])
+  {
+    stateInit();
+  }
   outputTestState();
 }
 
 void AraigGui::outputTestState()
 {
   //input: 0: completed, 1: succeeded, 2:failed
-  bool completed = input_states_[0];
-  bool succ = input_states_[1];
-  bool failed = input_states_[2];
+  // 3:start, 4:stop, 5:reset, 6:check_succ, 7:check_failed
+  completed_ = input_states_[0];
+  succ_ = input_states_[1];
+  failed_ = input_states_[2];
+  test_ready_ = !input_states_[3];
+  interrupt_test_ = input_states_[4];
+  result_recorded_ = input_states_[6]||input_states_[7];
 
-  if(!completed && !test_ready_ && !result_recorded_) // test is running
-  {
-    ui_.lbTestState->setText("Test running!");
-    ui_.lbTestResult->setText("Waiting for result...");
-  }
-  else if(completed && !result_recorded_ && !interrupt_test_) // test completed
-  {
-    if(failed == succ)
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Error in result!");
-    }
-    else if(failed) // test fails
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Test failed!");
-    }
-    else if(succ) // test succeeds
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Test succeeded!");
-    }
-  }
-  else if (test_ready_) // test is ready
+  if(test_ready_) // test ready
   {
     ui_.lbTestState->setText("Test ready!");
     ui_.lbTestResult->setText("Wait for start!");
   }
-  else if (completed && result_recorded_ && !interrupt_test_) // test is recorded
+  else if(!completed_) // test running
   {
-    ui_.lbTestState->setText("Please reset!");
-    ui_.lbTestResult->setText("Result recorded!");
+    ui_.lbTestState->setText("Test running!");
+    ui_.lbTestResult->setText("Waiting for result...");
   }
-  else if (completed && interrupt_test_) // test interrupted
+  else
   {
-    ui_.lbTestState->setText("Test interrupted!");
-    ui_.lbTestResult->setText("Test failed!");
+    if(interrupt_test_) // test interrupted
+    {
+      ui_.lbTestState->setText("Test interrupted!");
+      ui_.lbTestResult->setText("Test failed!");
+    }
+    else if(result_recorded_) // test recorded
+    {
+      ui_.lbTestState->setText("Please reset!");
+      ui_.lbTestResult->setText("Result recorded!");
+    }
+    else if(failed_ == succ_) // error in result
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Error in result!");
+    }
+    else if(failed_) // test fails
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Test failed!");
+    }
+    else if(succ_) // test succeeds
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Test succeeded!");
+    }
+    else // otherwise
+    {
+      ui_.lbTestState->setText("Please reset!");
+      ui_.lbTestResult->setText(" ");
+    }
   }
-  else // otherwise
-  {
-    ui_.lbTestState->setText("Please reset!");
-    ui_.lbTestResult->setText(" ");
-  }
+
+//  if(!completed_ && !test_ready_ && !result_recorded_) // test is running
+//  {
+//    ui_.lbTestState->setText("Test running!");
+//    ui_.lbTestResult->setText("Waiting for result...");
+//  }
+//  else if(completed_ && !result_recorded_ && !interrupt_test_) // test completed
+//  {
+//    if(failed_ == succ_)
+//    {
+//      ui_.lbTestState->setText("Test completed!");
+//      ui_.lbTestResult->setText("Error in result!");
+//    }
+//    else if(failed_) // test fails
+//    {
+//      ui_.lbTestState->setText("Test completed!");
+//      ui_.lbTestResult->setText("Test failed!");
+//    }
+//    else if(succ_) // test succeeds
+//    {
+//      ui_.lbTestState->setText("Test completed!");
+//      ui_.lbTestResult->setText("Test succeeded!");
+//    }
+//  }
+//  else if (test_ready_) // test is ready
+//  {
+//    ui_.lbTestState->setText("Test ready!");
+//    ui_.lbTestResult->setText("Wait for start!");
+//  }
+//  else if (completed_ && result_recorded_ && !interrupt_test_) // test is recorded
+//  {
+//    ui_.lbTestState->setText("Please reset!");
+//    ui_.lbTestResult->setText("Result recorded!");
+//  }
+//  else if (completed_ && interrupt_test_) // test interrupted
+//  {
+//    ui_.lbTestState->setText("Test interrupted!");
+//    ui_.lbTestResult->setText("Test failed!");
+//  }
+//  else // otherwise
+//  {
+//    ui_.lbTestState->setText("Please reset!");
+//    ui_.lbTestResult->setText(" ");
+//  }
 }
 
 void AraigGui::pubPublish(int idx)
@@ -165,9 +229,6 @@ void AraigGui::stateInit()
   for (auto it = input_states_.begin();it!=input_states_.end();it++) {
     *it = false;
   }
-  interrupt_test_ = false;
-  test_ready_ = true;
-  result_recorded_ = false;
 }
 
 void AraigGui::on_pbTestStart_clicked()
@@ -179,8 +240,8 @@ void AraigGui::on_pbTestStart_clicked()
   output_states_[2] = false;
   pubPublish(0);
   ROS_INFO_STREAM("[GUI]: test started!");
-  test_ready_ = false;
-  outputTestState();
+  //test_ready_ = false;
+  //outputTestState();
 }
 
 void AraigGui::on_pbTestStop_clicked()
@@ -190,8 +251,8 @@ void AraigGui::on_pbTestStop_clicked()
   output_states_[2] = false;
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
-  interrupt_test_ = true;
-  outputTestState();
+  //interrupt_test_ = true;
+  //outputTestState();
 }
 
 void AraigGui::on_pbTestReset_clicked()
@@ -202,8 +263,8 @@ void AraigGui::on_pbTestReset_clicked()
   pubPublish(2);
   ROS_INFO_STREAM("[GUI]: test reseted!");
 
-  stateInit();
-  outputTestState();
+  //stateInit();
+  //outputTestState();
 }
 
 void AraigGui::on_pbTestSucc_clicked()
@@ -211,9 +272,9 @@ void AraigGui::on_pbTestSucc_clicked()
   output_states_[3] = true;
   output_states_[4] = false;
   pubPublish(3);
-  result_recorded_ = true;
+  //result_recorded_ = true;
   ROS_INFO_STREAM("[GUI]: Result recorded!");
-  outputTestState();
+  //outputTestState();
 }
 
 void AraigGui::on_pbTestFail_clicked()
@@ -221,9 +282,9 @@ void AraigGui::on_pbTestFail_clicked()
   output_states_[3] = false;
   output_states_[4] = true;
   pubPublish(4);
-  result_recorded_ = true;
+  //result_recorded_ = true;
   ROS_INFO_STREAM("[GUI]: Result recorded!");
-  outputTestState();
+  //outputTestState();
 }
 
 PLUGINLIB_EXPORT_CLASS(AraigGui, rqt_gui_cpp::Plugin)
