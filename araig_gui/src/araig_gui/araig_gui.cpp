@@ -39,13 +39,13 @@ void AraigGui::initPlugin(qt_gui_cpp::PluginContext& context)
   connect(ui_.pbTestFail, SIGNAL(clicked()), this, SLOT(on_pbTestFail_clicked()));
 
   nh_ = getNodeHandle();
-  name_inputs_ = {"start_test", "interrupt_test", "reset_test", "check_succeed", "check_failed"};
-  name_outputs_ = {"test_completed", "test_succeeded", "test_failed"};
+  name_inputs_ = {"test_completed", "test_succeeded", "test_failed"};
+  name_outputs_ = {"start_test", "interrupt_test", "reset_test", "check_succeed", "check_failed"};
   num_inputs_ = int(name_inputs_.size());
   num_outputs_ = int(name_outputs_.size());
-  input_pubs_.resize(static_cast<std::vector<ros::Publisher>::size_type>(num_inputs_));
+  input_subs_.resize(static_cast<std::vector<ros::Publisher>::size_type>(num_inputs_));
   input_states_.resize(static_cast<std::vector<bool>::size_type>(num_inputs_));
-  output_subs_.resize(static_cast<std::vector<ros::Subscriber>::size_type>(num_outputs_));
+  output_pubs_.resize(static_cast<std::vector<ros::Subscriber>::size_type>(num_outputs_));
   output_states_.resize(static_cast<std::vector<bool>::size_type>(num_outputs_));
   spawnPubs();
   spawnSubs();
@@ -70,59 +70,38 @@ void AraigGui::restoreSettings(const qt_gui_cpp::Settings& plugin_settings,
 
 void AraigGui::spawnPubs()
 {
-  for(int i=0; i<num_inputs_; i++)
+  for(int i=0; i<num_outputs_; i++)
   {
-    std::string topicName = "/signal/ui/" + name_inputs_[static_cast<std::vector<std::string>::size_type>(i)];
-    input_pubs_[static_cast<std::vector<ros::Publisher>::size_type>(i)]
+    std::string topicName = "/signal/ui/" + name_outputs_[static_cast<std::vector<std::string>::size_type>(i)];
+    output_pubs_[static_cast<std::vector<ros::Publisher>::size_type>(i)]
         = nh_.advertise<araig_msgs::BoolStamped>(topicName, 10);
-    ROS_INFO_STREAM("[GUI]: Spawned input topic publisher " << i << " for : " << topicName);
+    ROS_INFO_STREAM("[GUI]: Spawned output topic publisher " << i << " for : " << topicName);
   }
 }
 
 void AraigGui::spawnSubs()
 {
-  for(int i=0; i<num_outputs_; i++)
+  for(int i=0; i<num_inputs_; i++)
   {
-    std::string topicName = "/signal/runner/" + name_outputs_[static_cast<std::vector<std::string>::size_type>(i)];
-    output_subs_[static_cast<std::vector<ros::Subscriber>::size_type>(i)]
-        = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&AraigGui::callbackBool, this, _1, topicName));
-    ROS_INFO_STREAM("[GUI]: Spawned output topic subscriber " << i << " for : " << topicName);
+    std::string topicName = "/signal/runner/" + name_inputs_[static_cast<std::vector<std::string>::size_type>(i)];
+    input_subs_[static_cast<std::vector<ros::Subscriber>::size_type>(i)]
+        = nh_.subscribe<araig_msgs::BoolStamped>(topicName, 10, boost::bind(&AraigGui::callbackBool, this, _1, i));
+    ROS_INFO_STREAM("[GUI]: Spawned input topic subscriber " << i << " for : " << topicName);
   }
 }
 
-int AraigGui::getIndexInVector(std::vector<std::string> vec, std::string topicName)
+void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const int &topicIdx)
 {
-  auto it = find(vec.begin(), vec.end(), topicName);
-  if(it != vec.end())
-  {
-    int idx = static_cast<int>(it - vec.begin());
-    return idx;
-  }
-  else
-  {
-    return -1;
-  }
-}
-
-void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const std::string &topicName)
-{
-  std::vector<std::string> nameElems;
-  boost::split(nameElems, topicName, [](char c){return c == '/';});
-
-  int idx = getIndexInVector(name_outputs_, nameElems.back());
-  if(idx !=-1)
-  {
-    output_states_[static_cast<std::vector<bool>::size_type>(idx)] = msg->data? true:false;
-    outputTestState();
-  }
+  input_states_[static_cast<std::vector<bool>::size_type>(topicIdx)] = msg->data? true:false;
+  outputTestState();
 }
 
 void AraigGui::outputTestState()
 {
-  //output: 0: completed, 1: succeeded, 2:failed
-  bool completed = output_states_[0];
-  bool succ = output_states_[1];
-  bool failed = output_states_[2];
+  //input: 0: completed, 1: succeeded, 2:failed
+  bool completed = input_states_[0];
+  bool succ = input_states_[1];
+  bool failed = input_states_[2];
 
   if(!completed && !test_ready_ && !result_recorded_) // test is running
   {
@@ -173,8 +152,8 @@ void AraigGui::pubPublish(int idx)
 {
   araig_msgs::BoolStamped msg;
   msg.header.stamp = ros::Time::now();
-  msg.data = input_states_[static_cast<std::vector<bool>::size_type>(idx)]?true:false;
-  input_pubs_[static_cast<std::vector<ros::Publisher>::size_type>(idx)].publish(msg);
+  msg.data = output_states_[idx]?true:false;
+  output_pubs_[idx].publish(msg);
   ros::spinOnce();
 }
 
@@ -193,11 +172,11 @@ void AraigGui::stateInit()
 
 void AraigGui::on_pbTestStart_clicked()
 {
-  //input: 0:start, 1:stop, 2:reset, 3:succ, 4:failed
-  //output: 0: completed, 1: succeeded, 2:failed
-  input_states_[0] = true;
-  input_states_[1] = false;
-  input_states_[2] = false;
+  //output: 0:start, 1:stop, 2:reset, 3:succ, 4:failed
+  //input: 0: completed, 1: succeeded, 2:failed
+  output_states_[0] = true;
+  output_states_[1] = false;
+  output_states_[2] = false;
   pubPublish(0);
   ROS_INFO_STREAM("[GUI]: test started!");
   test_ready_ = false;
@@ -206,9 +185,9 @@ void AraigGui::on_pbTestStart_clicked()
 
 void AraigGui::on_pbTestStop_clicked()
 {
-  input_states_[0] = false;
-  input_states_[1] = true;
-  input_states_[2] = false;
+  output_states_[0] = false;
+  output_states_[1] = true;
+  output_states_[2] = false;
   pubPublish(1);
   ROS_INFO_STREAM("[GUI]: test stopped!");
   interrupt_test_ = true;
@@ -217,9 +196,9 @@ void AraigGui::on_pbTestStop_clicked()
 
 void AraigGui::on_pbTestReset_clicked()
 {
-  input_states_[0] = false;
-  input_states_[1] = false;
-  input_states_[2] = true;
+  output_states_[0] = false;
+  output_states_[1] = false;
+  output_states_[2] = true;
   pubPublish(2);
   ROS_INFO_STREAM("[GUI]: test reseted!");
 
@@ -229,8 +208,8 @@ void AraigGui::on_pbTestReset_clicked()
 
 void AraigGui::on_pbTestSucc_clicked()
 {
-  input_states_[3] = true;
-  input_states_[4] = false;
+  output_states_[3] = true;
+  output_states_[4] = false;
   pubPublish(3);
   result_recorded_ = true;
   ROS_INFO_STREAM("[GUI]: Result recorded!");
@@ -239,8 +218,8 @@ void AraigGui::on_pbTestSucc_clicked()
 
 void AraigGui::on_pbTestFail_clicked()
 {
-  input_states_[3] = false;
-  input_states_[4] = true;
+  output_states_[3] = false;
+  output_states_[4] = true;
   pubPublish(4);
   result_recorded_ = true;
   ROS_INFO_STREAM("[GUI]: Result recorded!");

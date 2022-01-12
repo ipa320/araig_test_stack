@@ -34,8 +34,8 @@ public:
 
 protected:
   ros::NodeHandle nh_;
-  std::vector<ros::Publisher> input_pubs_;
-  std::vector<ros::Subscriber> output_subs_;
+  std::vector<ros::Subscriber> input_subs_;
+  std::vector<ros::Publisher> output_pubs_;
 private:
   bool interrupt_test_ = false;
   bool test_ready_ = false;
@@ -48,11 +48,10 @@ private:
   std::vector<bool> output_states_;
 
 public:
-  void callbackBool(const araig_msgs::BoolStamped::ConstPtr& msg, const std::string &topicName);
+  void callbackBool(const araig_msgs::BoolStamped::ConstPtr& msg, const int &topicIdx);
   void outputTestState();
   void spawnPubs();
   void spawnSubs();
-  int getIndexInVector(std::vector<std::string> vec, std::string topicName);
   void pubPublish(int idx);
   void stateInit();
 
