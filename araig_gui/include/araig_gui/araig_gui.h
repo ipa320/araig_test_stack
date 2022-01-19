@@ -40,6 +40,9 @@ private:
   bool interrupt_test_ = false;
   bool test_ready_ = false;
   bool result_recorded_ = false;
+  bool completed_ = false;
+  bool succ_ = false;
+  bool failed_ = false;
   int num_inputs_;
   int num_outputs_;
   std::vector<std::string> name_inputs_;

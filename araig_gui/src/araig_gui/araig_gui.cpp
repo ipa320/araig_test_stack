@@ -99,52 +99,52 @@ void AraigGui::callbackBool(const araig_msgs::BoolStamped::ConstPtr &msg, const 
 void AraigGui::outputTestState()
 {
   //input: 0: completed, 1: succeeded, 2:failed
-  bool completed = input_states_[0];
-  bool succ = input_states_[1];
-  bool failed = input_states_[2];
+  completed_ = input_states_[0];
+  succ_ = input_states_[1];
+  failed_ = input_states_[2];
 
-  if(!completed && !test_ready_ && !result_recorded_) // test is running
-  {
-    ui_.lbTestState->setText("Test running!");
-    ui_.lbTestResult->setText("Waiting for result...");
-  }
-  else if(completed && !result_recorded_ && !interrupt_test_) // test completed
-  {
-    if(failed == succ)
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Error in result!");
-    }
-    else if(failed) // test fails
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Test failed!");
-    }
-    else if(succ) // test succeeds
-    {
-      ui_.lbTestState->setText("Test completed!");
-      ui_.lbTestResult->setText("Test succeeded!");
-    }
-  }
-  else if (test_ready_) // test is ready
+  if(test_ready_) // test ready
   {
     ui_.lbTestState->setText("Test ready!");
     ui_.lbTestResult->setText("Wait for start!");
   }
-  else if (completed && result_recorded_ && !interrupt_test_) // test is recorded
+  else if(!completed_) // test running
   {
-    ui_.lbTestState->setText("Please reset!");
-    ui_.lbTestResult->setText("Result recorded!");
+    ui_.lbTestState->setText("Test running!");
+    ui_.lbTestResult->setText("Waiting for result...");
   }
-  else if (completed && interrupt_test_) // test interrupted
+  else
   {
-    ui_.lbTestState->setText("Test interrupted!");
-    ui_.lbTestResult->setText("Test failed!");
-  }
-  else // otherwise
-  {
-    ui_.lbTestState->setText("Please reset!");
-    ui_.lbTestResult->setText(" ");
+    if(interrupt_test_) // test interrupted
+    {
+      ui_.lbTestState->setText("Test interrupted!");
+      ui_.lbTestResult->setText("Test failed!");
+    }
+    else if(result_recorded_) // test recorded
+    {
+      ui_.lbTestState->setText("Please reset!");
+      ui_.lbTestResult->setText("Result recorded!");
+    }
+    else if(failed_ == succ_) // error in result
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Error in result!");
+    }
+    else if(failed_) // test fails
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Test failed!");
+    }
+    else if(succ_) // test succeeds
+    {
+      ui_.lbTestState->setText("Test completed!");
+      ui_.lbTestResult->setText("Test succeeded!");
+    }
+    else // otherwise
+    {
+      ui_.lbTestState->setText("Please reset!");
+      ui_.lbTestResult->setText(" ");
+    }
   }
 }
 
