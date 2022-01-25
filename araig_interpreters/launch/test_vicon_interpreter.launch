@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- X Y Z Y P R transform of vicon origin frame wrt map frame. Needs to be physically measured. -->
+    <arg name="origin_pos" default="0 0 0 0 0 0"/>
+    <arg name="datastream_hostport" default="192.168.10.1:801"/>
+
+    <node pkg="tf" type="static_transform_publisher" name="vicon_origin" 
+    args="$(arg origin_pos) /map /vicon/world 1"/>
+
+    <include file="$(find vicon_bridge)/launch/vicon.launch"/>
+
+    <node pkg="araig_interpreter" type="vicon_interpreter" name="vicon_interpreter" output="screen"/>
+    
+</launch>

@@ -39,6 +39,13 @@ target_link_libraries(marvel_location_interpreter ${catkin_LIBRARIES} ${Boost_LI
 add_dependencies(marvel_location_interpreter ${catkin_EXPORTED_TARGETS})
 install(TARGETS marvel_location_interpreter DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+add_executable(vicon_location_interpreter 
+src/location_interpreters/vicon_interpreter_node.cpp
+src/location_interpreters/vicon_interpreter.cpp)
+target_link_libraries(vicon_location_interpreter ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_dependencies(vicon_location_interpreter ${catkin_EXPORTED_TARGETS})
+install(TARGETS vicon_location_interpreter DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 catkin_install_python(PROGRAMS
    scripts/pose_tf_broadcaster
    scripts/goal_interpreter
