@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="araig_gui" type="araig_gui" name="gui_node" output="screen"/>
+
+    <node pkg="araig_gui" type="test_araig_gui.py" name="test_node" output="screen"/>
+</launch>

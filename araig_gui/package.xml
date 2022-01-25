@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <name>araig_gui</name>
+  <version>0.0.1</version>
+  <description>The GUI for araig tests</description>
+  <maintainer email="changxuan.li@ipa.fraunhofer.de">Changxuan Li</maintainer>
+  <maintainer email="tejas.kumar.shastha@ipa.fraunhofer.de">Tejas Kumar Shastha</maintainer>
+  <license>BSD</license>
+  <author email="changxuan.li@ipa.fraunhofer.de">Changxuan Li</author>
+
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>araig_msgs</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslint</build_depend>
+  <build_depend>rqt_gui</build_depend>
+  <build_depend>rqt_gui_cpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <run_depend>araig_msgs</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>rqt_gui_cpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+
+  <export>
+    <rqt_gui plugin="${prefix}/plugin.xml"/>
+  </export>
+</package>
