@@ -10,6 +10,16 @@ interpreters:
   goal_action: move_base # if "None", won't use action
   wait_action: 5 # time for waiting for action available
   rate: 100
+  
   velocity_interpreter: # node name 
     max_vel: 5
     rate: 100
+
+  obstacle_tf2_broadcaster_node:
+    child_frame_id: obstacle
+    frame_id: map
+    position:
+      x: -1
+      y: 0
+      z: 0
+    yaw: 1.57 # degree
